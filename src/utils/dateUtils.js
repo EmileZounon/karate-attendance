@@ -7,6 +7,8 @@ export const generateDates = () => {
       if (d.getMonth() !== month) break;
       // Thursday = 4, Sunday = 0
       if (d.getDay() === 4 || d.getDay() === 0) {
+        // Skip Jan 1 (New Year's Day - no class)
+        if (month === 0 && day === 1) continue;
         const dateStr = `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         dates.push(dateStr);
       }
