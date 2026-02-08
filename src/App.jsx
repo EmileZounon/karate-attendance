@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { useFirestore } from './hooks/useFirestore';
 import { defaultStudents, defaultAttendance } from './data/defaults';
 import AttendanceTab from './components/AttendanceTab';
 import AnalyticsTab from './components/AnalyticsTab';
@@ -10,7 +10,7 @@ const TABS = ['Attendance', 'Analytics', 'Charts', 'Manage Students'];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Attendance');
-  const [data, setData] = useLocalStorage('karate-attendance-data', {
+  const [data, setData, loading, error] = useFirestore({
     students: defaultStudents,
     attendance: defaultAttendance,
     savedAt: new Date().toISOString(),
@@ -40,6 +40,17 @@ export default function App() {
     ? new Date(data.savedAt).toLocaleString()
     : 'Never';
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading attendance data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[1400px] mx-auto p-4">
       <header className="text-center mb-6">
@@ -48,6 +59,7 @@ export default function App() {
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           Last saved: {savedTime}
+          {error && <span className="text-red-500 ml-2">(offline mode)</span>}
         </p>
       </header>
 

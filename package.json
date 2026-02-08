@@ -15,7 +15,8 @@
     "recharts": "^2.10.0",
     "jspdf": "^2.5.1",
     "html2canvas": "^1.4.1",
-    "mammoth": "^1.6.0"
+    "mammoth": "^1.6.0",
+    "firebase": "^10.8.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
