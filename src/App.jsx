@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useFirestore } from './hooks/useFirestore';
 import { defaultStudents, defaultAttendance } from './data/defaults';
 import AttendanceTab from './components/AttendanceTab';
@@ -35,6 +35,11 @@ export default function App() {
   const importData = (imported) => {
     setData({ ...imported, savedAt: new Date().toISOString() });
   };
+
+  const sortedStudents = useMemo(
+    () => [...data.students].sort((a, b) => a.localeCompare(b)),
+    [data.students]
+  );
 
   const savedTime = data.savedAt
     ? new Date(data.savedAt).toLocaleString()
@@ -80,26 +85,26 @@ export default function App() {
       <main>
         {activeTab === 'Attendance' && (
           <AttendanceTab
-            students={data.students}
+            students={sortedStudents}
             attendance={data.attendance}
             updateAttendance={updateAttendance}
           />
         )}
         {activeTab === 'Analytics' && (
           <AnalyticsTab
-            students={data.students}
+            students={sortedStudents}
             attendance={data.attendance}
           />
         )}
         {activeTab === 'Charts' && (
           <ChartsTab
-            students={data.students}
+            students={sortedStudents}
             attendance={data.attendance}
           />
         )}
         {activeTab === 'Manage Students' && (
           <ManageStudentsTab
-            students={data.students}
+            students={sortedStudents}
             attendance={data.attendance}
             updateStudents={updateStudents}
             updateAttendance={updateAttendance}
