@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Only allow access to the specific document the app uses
+    match /attendance-data/main {
+      allow read: if true;
+
+      // Allow writes but limit document size to prevent abuse
+      allow write: if request.resource.data.keys().size() > 0
+                   && request.resource.size() < 1048576; // 1MB max
+    }
+
+    // Deny access to everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
