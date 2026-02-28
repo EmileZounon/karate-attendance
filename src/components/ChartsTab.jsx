@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   LineChart, Line, ResponsiveContainer, Cell
 } from 'recharts';
 import { generateDates, formatDate, getMonthLabel, getMonthKey } from '../utils/dateUtils';
@@ -26,8 +26,8 @@ export default function ChartsTab({ students, attendance }) {
   const monthlySummary = useMemo(() => calculateMonthlySummary(dates, attendance), [dates, attendance]);
   const studentMonthly = useMemo(() => calculateStudentMonthly(students, dates, attendance), [students, dates, attendance]);
   const classesHeld = useMemo(() => getClassesHeld(dates, attendance), [dates, attendance]);
+  const [jumpChart, setJumpChart] = useState('');
 
-  // Data for "Students per class" line chart
   const classAttendanceData = useMemo(() =>
     classesHeld.map(date => ({
       date: formatDate(date),
@@ -36,7 +36,6 @@ export default function ChartsTab({ students, attendance }) {
     [classesHeld, attendance]
   );
 
-  // Data for per-month student attendance charts
   const months = monthlySummary.map(m => m.monthKey);
   const monthlyStudentData = useMemo(() => {
     return months.map(monthKey => ({
@@ -53,12 +52,42 @@ export default function ChartsTab({ students, attendance }) {
     }));
   }, [months, students, studentMonthly]);
 
+  // Build jump options dynamically from available charts
+  const chartSections = [
+    { id: 'chart-total',         label: 'Total Attendance by Student' },
+    ...monthlyStudentData.map(({ monthKey, label }) => ({
+      id: `chart-month-${monthKey}`,
+      label: `${label} — By Student`,
+    })),
+    { id: 'chart-monthly-total', label: 'Monthly Total Attendance' },
+    { id: 'chart-per-class',     label: 'Students per Class Over Time' },
+  ];
+
+  const handleJump = (e) => {
+    const id = e.target.value;
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setJumpChart('');
+  };
+
   return (
     <div>
-      <div className="flex justify-end mb-4 no-print">
+      <div className="flex flex-wrap gap-2 justify-between mb-4 no-print">
+        {/* Jump to chart */}
+        <select
+          value={jumpChart}
+          onChange={handleJump}
+          className="px-3 py-2 border rounded-lg text-sm bg-white"
+        >
+          <option value="">Jump to chart…</option>
+          {chartSections.map(s => (
+            <option key={s.id} value={s.id}>{s.label}</option>
+          ))}
+        </select>
+
         <button
           onClick={() => downloadPDF('charts-content', 'Karate_Charts_Report', 'landscape')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
         >
           Download Charts Report (PDF)
         </button>
@@ -66,84 +95,84 @@ export default function ChartsTab({ students, attendance }) {
 
       <div id="charts-content" className="space-y-10 bg-white p-6 rounded-lg">
         {/* Chart 1: Total Attendance by Student */}
-        <section>
+        <section id="chart-total">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Total Attendance by Student</h2>
           <div className="h-64 sm:h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={studentStats} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="attended" name="Classes Attended">
-                {studentStats.map((entry, index) => (
-                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={studentStats} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="attended" name="Classes Attended">
+                  {studentStats.map((entry, index) => (
+                    <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
         {/* Per-month student attendance charts */}
         {monthlyStudentData.map(({ monthKey, label, data }) => (
-          <section key={monthKey}>
+          <section key={monthKey} id={`chart-month-${monthKey}`}>
             <h2 className="text-xl font-bold text-gray-800 mb-4">{label} — Attendance by Student</h2>
             <div className="h-64 sm:h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="attended" name="Classes Attended">
-                  {data.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="attended" name="Classes Attended">
+                    {data.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </section>
         ))}
 
-        {/* Chart 3: Monthly Total Attendance */}
-        <section>
+        {/* Monthly Total Attendance */}
+        <section id="chart-monthly-total">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Total Attendance</h2>
           <div className="h-56 sm:h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlySummary} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="totalAttendance" name="Total Attendance" fill="#2563eb" />
-              <Bar dataKey="classesHeld" name="Classes Held" fill="#16a34a" />
-            </BarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlySummary} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="totalAttendance" name="Total Attendance" fill="#2563eb" />
+                <Bar dataKey="classesHeld" name="Classes Held" fill="#16a34a" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
-        {/* Chart 4: Students per Class Over Time */}
-        <section>
+        {/* Students per Class Over Time */}
+        <section id="chart-per-class">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Students per Class Over Time</h2>
           <div className="h-56 sm:h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={classAttendanceData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="students"
-                stroke="#2563eb"
-                strokeWidth={2}
-                dot={{ r: 5 }}
-                name="Students Present"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={classAttendanceData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="students"
+                  stroke="#2563eb"
+                  strokeWidth={2}
+                  dot={{ r: 5 }}
+                  name="Students Present"
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </section>
       </div>

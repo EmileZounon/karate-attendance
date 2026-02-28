@@ -11,6 +11,14 @@ import { downloadPDF } from '../utils/pdfExport';
 const MEDALS = ['🥇', '🥈', '🥉'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
+const ANALYTICS_SECTIONS = [
+  { id: 'section-monthly-lb',      label: 'Monthly Leaderboards' },
+  { id: 'section-leaderboard',     label: 'Overall Leaderboard' },
+  { id: 'section-student-stats',   label: 'Student Statistics' },
+  { id: 'section-monthly-summary', label: 'Monthly Summary' },
+  { id: 'section-by-month',        label: 'Student Attendance by Month' },
+];
+
 export default function AnalyticsTab({ students, attendance }) {
   const dates = useMemo(() => generateDates(), []);
   const studentStats = useMemo(() => calculateStudentStats(students, dates, attendance), [students, dates, attendance]);
@@ -18,6 +26,7 @@ export default function AnalyticsTab({ students, attendance }) {
   const studentMonthly = useMemo(() => calculateStudentMonthly(students, dates, attendance), [students, dates, attendance]);
   const months = monthlySummary.map(m => m.monthKey);
   const [selectedMonth, setSelectedMonth] = useState(() => months[months.length - 1] || '');
+  const [jumpSection, setJumpSection] = useState('');
 
   // Top 3 students per month (instructors excluded)
   const monthlyLeaderboard = useMemo(() =>
@@ -51,17 +60,37 @@ export default function AnalyticsTab({ students, attendance }) {
     }))
     .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name));
 
+  const handleJump = (e) => {
+    const id = e.target.value;
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setJumpSection('');
+  };
+
   return (
     <div>
       {/* Action bar */}
-      <div className="flex flex-wrap gap-2 justify-end mb-4 no-print">
-        <button
-          onClick={() => downloadPDF('analytics-content', 'Karate_Attendance_Report', 'portrait')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+      <div className="flex flex-wrap gap-2 justify-between mb-4 no-print">
+        {/* Jump to section */}
+        <select
+          value={jumpSection}
+          onChange={handleJump}
+          className="px-3 py-2 border rounded-lg text-sm bg-white"
         >
-          Download Full Report (PDF)
-        </button>
-        <div className="flex gap-2 items-center">
+          <option value="">Jump to section…</option>
+          {ANALYTICS_SECTIONS.map(s => (
+            <option key={s.id} value={s.id}>{s.label}</option>
+          ))}
+        </select>
+
+        {/* PDF buttons */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <button
+            onClick={() => downloadPDF('analytics-content', 'Karate_Attendance_Report', 'portrait')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          >
+            Download Full Report (PDF)
+          </button>
           <select
             value={selectedMonth}
             onChange={e => setSelectedMonth(e.target.value)}
@@ -90,7 +119,6 @@ export default function AnalyticsTab({ students, attendance }) {
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Karate Black Belt Program — {getMonthLabel(selectedMonth)}
         </h1>
-
         {selectedMonthlySummary && (
           <section className="mb-6">
             <h2 className="text-xl font-bold text-gray-800 mb-3">Monthly Summary</h2>
@@ -114,7 +142,6 @@ export default function AnalyticsTab({ students, attendance }) {
             </table>
           </section>
         )}
-
         <section>
           <h2 className="text-xl font-bold text-gray-800 mb-3">Student Attendance</h2>
           <table className="min-w-full text-sm border rounded-lg">
@@ -145,39 +172,8 @@ export default function AnalyticsTab({ students, attendance }) {
       </div>
 
       <div id="analytics-content" className="space-y-8">
-        {/* Leaderboard */}
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Leaderboard</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left min-w-[60px]">Rank</th>
-                  <th className="px-4 py-2 text-left min-w-[120px]">Student</th>
-                  <th className="px-4 py-2 text-center min-w-[130px]">Classes Attended</th>
-                  <th className="px-4 py-2 text-center min-w-[120px]">Attendance %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentStats.filter(s => !INSTRUCTORS.includes(s.name)).map((s, i) => (
-                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2 font-bold text-lg">
-                      {i < 3 ? MEDALS[i] : i + 1}
-                    </td>
-                    <td className="px-4 py-2 font-medium">{s.name}</td>
-                    <td className="px-4 py-2 text-center">{s.attended}</td>
-                    <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
-                      {s.percentage}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Monthly Leaderboards */}
-        <section>
+        {/* Monthly Leaderboards — top of page */}
+        <section id="section-monthly-lb">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Leaderboards</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {monthlyLeaderboard.map(({ monthKey, month, ranked }) => (
@@ -210,8 +206,39 @@ export default function AnalyticsTab({ students, attendance }) {
           </div>
         </section>
 
+        {/* Overall Leaderboard */}
+        <section id="section-leaderboard">
+          <h2 className="text-xl font-bold text-gray-800 mb-3">Overall Leaderboard</h2>
+          <div className="overflow-x-auto border rounded-lg shadow-sm">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left min-w-[60px]">Rank</th>
+                  <th className="px-4 py-2 text-left min-w-[120px]">Student</th>
+                  <th className="px-4 py-2 text-center min-w-[130px]">Classes Attended</th>
+                  <th className="px-4 py-2 text-center min-w-[120px]">Attendance %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentStats.filter(s => !INSTRUCTORS.includes(s.name)).map((s, i) => (
+                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-2 font-bold text-lg">
+                      {i < 3 ? MEDALS[i] : i + 1}
+                    </td>
+                    <td className="px-4 py-2 font-medium">{s.name}</td>
+                    <td className="px-4 py-2 text-center">{s.attended}</td>
+                    <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
+                      {s.percentage}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         {/* Student Statistics */}
-        <section>
+        <section id="section-student-stats">
           <h2 className="text-xl font-bold text-gray-800 mb-3">Student Statistics</h2>
           <div className="overflow-x-auto border rounded-lg shadow-sm">
             <table className="min-w-full text-sm">
@@ -242,7 +269,7 @@ export default function AnalyticsTab({ students, attendance }) {
         </section>
 
         {/* Monthly Summary */}
-        <section>
+        <section id="section-monthly-summary">
           <h2 className="text-xl font-bold text-gray-800 mb-3">Monthly Summary</h2>
           <div className="overflow-x-auto border rounded-lg shadow-sm">
             <table className="min-w-full text-sm">
@@ -269,7 +296,7 @@ export default function AnalyticsTab({ students, attendance }) {
         </section>
 
         {/* Student Attendance by Month */}
-        <section>
+        <section id="section-by-month">
           <h2 className="text-xl font-bold text-gray-800 mb-3">Student Attendance by Month</h2>
           <div className="overflow-x-auto border rounded-lg shadow-sm">
             <table className="min-w-full text-sm">
