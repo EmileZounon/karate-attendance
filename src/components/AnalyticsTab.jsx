@@ -11,14 +11,6 @@ import { downloadPDF } from '../utils/pdfExport';
 const MEDALS = ['🥇', '🥈', '🥉'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
-const ANALYTICS_SECTIONS = [
-  { id: 'section-monthly-lb',      label: 'Monthly Leaderboards' },
-  { id: 'section-leaderboard',     label: 'Overall Leaderboard' },
-  { id: 'section-student-stats',   label: 'Student Statistics' },
-  { id: 'section-monthly-summary', label: 'Monthly Summary' },
-  { id: 'section-by-month',        label: 'Student Attendance by Month' },
-];
-
 export default function AnalyticsTab({ students, attendance }) {
   const dates = useMemo(() => generateDates(), []);
   const studentStats = useMemo(() => calculateStudentStats(students, dates, attendance), [students, dates, attendance]);
@@ -26,9 +18,8 @@ export default function AnalyticsTab({ students, attendance }) {
   const studentMonthly = useMemo(() => calculateStudentMonthly(students, dates, attendance), [students, dates, attendance]);
   const months = monthlySummary.map(m => m.monthKey);
   const [selectedMonth, setSelectedMonth] = useState(() => months[months.length - 1] || '');
-  const [jumpSection, setJumpSection] = useState('');
+  const [activeSection, setActiveSection] = useState('');
 
-  // Top 3 students per month (instructors excluded)
   const monthlyLeaderboard = useMemo(() =>
     monthlySummary.map(({ monthKey, month }) => {
       const ranked = studentMonthly
@@ -60,30 +51,206 @@ export default function AnalyticsTab({ students, attendance }) {
     }))
     .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name));
 
-  const handleJump = (e) => {
-    const id = e.target.value;
-    if (!id) return;
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setJumpSection('');
-  };
+  const sectionOptions = [
+    { id: 'monthly-lb',      label: 'Monthly Leaderboards' },
+    { id: 'leaderboard',     label: 'Overall Leaderboard' },
+    { id: 'student-stats',   label: 'Student Statistics' },
+    { id: 'monthly-summary', label: 'Monthly Summary' },
+    { id: 'by-month',        label: 'Student Attendance by Month' },
+  ];
+
+  const sectionLabel = sectionOptions.find(s => s.id === activeSection)?.label;
+
+  // ── Sections ────────────────────────────────────────────────
+
+  const monthlyLeaderboardSection = (
+    <section>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Leaderboards</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {monthlyLeaderboard.map(({ monthKey, month, ranked }) => (
+          <div key={monthKey} className="border rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-blue-600 text-white px-4 py-2 font-semibold">{month}</div>
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left">Rank</th>
+                  <th className="px-4 py-2 text-left">Student</th>
+                  <th className="px-4 py-2 text-center">Attended</th>
+                  <th className="px-4 py-2 text-center">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranked.map((s, i) => (
+                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-2 font-bold text-lg">{MEDALS[i]}</td>
+                    <td className="px-4 py-2 font-medium">{s.name}</td>
+                    <td className="px-4 py-2 text-center">{s.attended}</td>
+                    <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
+                      {s.percentage}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  const leaderboardSection = (
+    <section>
+      <h2 className="text-xl font-bold text-gray-800 mb-3">Overall Leaderboard</h2>
+      <div className="overflow-x-auto border rounded-lg shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left min-w-[60px]">Rank</th>
+              <th className="px-4 py-2 text-left min-w-[120px]">Student</th>
+              <th className="px-4 py-2 text-center min-w-[130px]">Classes Attended</th>
+              <th className="px-4 py-2 text-center min-w-[120px]">Attendance %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentStats.filter(s => !INSTRUCTORS.includes(s.name)).map((s, i) => (
+              <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-4 py-2 font-bold text-lg">{i < 3 ? MEDALS[i] : i + 1}</td>
+                <td className="px-4 py-2 font-medium">{s.name}</td>
+                <td className="px-4 py-2 text-center">{s.attended}</td>
+                <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>{s.percentage}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
+  const studentStatsSection = (
+    <section>
+      <h2 className="text-xl font-bold text-gray-800 mb-3">Student Statistics</h2>
+      <div className="overflow-x-auto border rounded-lg shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left">Rank</th>
+              <th className="px-4 py-2 text-left">Student</th>
+              <th className="px-4 py-2 text-center">Classes Attended</th>
+              <th className="px-4 py-2 text-center">Classes Held</th>
+              <th className="px-4 py-2 text-center">Attendance %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentStats.map((s, i) => (
+              <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-4 py-2">{i + 1}</td>
+                <td className="px-4 py-2 font-medium">{s.name}</td>
+                <td className="px-4 py-2 text-center">{s.attended}</td>
+                <td className="px-4 py-2 text-center">{s.total}</td>
+                <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>{s.percentage}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
+  const monthlySummarySection = (
+    <section>
+      <h2 className="text-xl font-bold text-gray-800 mb-3">Monthly Summary</h2>
+      <div className="overflow-x-auto border rounded-lg shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left">Month</th>
+              <th className="px-4 py-2 text-center">Total Attendance</th>
+              <th className="px-4 py-2 text-center">Classes Held</th>
+              <th className="px-4 py-2 text-center">Avg per Class</th>
+            </tr>
+          </thead>
+          <tbody>
+            {monthlySummary.map((m, i) => (
+              <tr key={m.monthKey} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-4 py-2 font-medium">{m.month}</td>
+                <td className="px-4 py-2 text-center">{m.totalAttendance}</td>
+                <td className="px-4 py-2 text-center">{m.classesHeld}</td>
+                <td className="px-4 py-2 text-center">{m.avgPerClass}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
+  const byMonthSection = (
+    <section>
+      <h2 className="text-xl font-bold text-gray-800 mb-3">Student Attendance by Month</h2>
+      <div className="overflow-x-auto border rounded-lg shadow-sm">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left">Student</th>
+              {months.map(m => (
+                <th key={m} className="px-4 py-2 text-center">{getMonthLabel(m)}</th>
+              ))}
+              <th className="px-4 py-2 text-center font-bold">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentMonthly
+              .sort((a, b) => {
+                const totalA = Object.values(a.months).reduce((sum, m) => sum + m.attended, 0);
+                const totalB = Object.values(b.months).reduce((sum, m) => sum + m.attended, 0);
+                return totalB - totalA;
+              })
+              .map((s, i) => {
+                const total = Object.values(s.months).reduce((sum, m) => sum + m.attended, 0);
+                return (
+                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-2 font-medium">{s.name}</td>
+                    {months.map(m => (
+                      <td key={m} className="px-4 py-2 text-center">
+                        {s.months[m] ? `${s.months[m].attended}/${s.months[m].total}` : '-'}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-center font-bold">{total}</td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
+  const allSections = { 'monthly-lb': monthlyLeaderboardSection, 'leaderboard': leaderboardSection, 'student-stats': studentStatsSection, 'monthly-summary': monthlySummarySection, 'by-month': byMonthSection };
 
   return (
     <div>
       {/* Action bar */}
       <div className="flex flex-wrap gap-2 justify-between mb-4 no-print">
-        {/* Jump to section */}
-        <select
-          value={jumpSection}
-          onChange={handleJump}
-          className="px-3 py-2 border rounded-lg text-sm bg-white"
-        >
-          <option value="">Jump to section…</option>
-          {ANALYTICS_SECTIONS.map(s => (
-            <option key={s.id} value={s.id}>{s.label}</option>
-          ))}
-        </select>
-
-        {/* PDF buttons */}
+        <div className="flex gap-2 items-center">
+          <select
+            value={activeSection}
+            onChange={e => setActiveSection(e.target.value)}
+            className="px-3 py-2 border rounded-lg text-sm bg-white"
+          >
+            <option value="">All sections</option>
+            {sectionOptions.map(s => (
+              <option key={s.id} value={s.id}>{s.label}</option>
+            ))}
+          </select>
+          {activeSection && (
+            <button
+              onClick={() => setActiveSection('')}
+              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              ← Back
+            </button>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2 items-center">
           <button
             onClick={() => downloadPDF('analytics-content', 'Karate_Attendance_Report', 'portrait')}
@@ -109,7 +276,7 @@ export default function AnalyticsTab({ students, attendance }) {
         </div>
       </div>
 
-      {/* Hidden month-specific content rendered off-screen for PDF capture */}
+      {/* Hidden month PDF content */}
       <div
         id="analytics-month-content"
         className="fixed bg-white p-6 w-[800px]"
@@ -161,9 +328,7 @@ export default function AnalyticsTab({ students, attendance }) {
                   <td className="px-4 py-2 font-medium">{s.name}</td>
                   <td className="px-4 py-2 text-center">{s.attended}</td>
                   <td className="px-4 py-2 text-center">{s.total}</td>
-                  <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
-                    {s.percentage}%
-                  </td>
+                  <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>{s.percentage}%</td>
                 </tr>
               ))}
             </tbody>
@@ -171,169 +336,12 @@ export default function AnalyticsTab({ students, attendance }) {
         </section>
       </div>
 
+      {/* Main content */}
       <div id="analytics-content" className="space-y-8">
-        {/* Monthly Leaderboards — top of page */}
-        <section id="section-monthly-lb">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Leaderboards</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {monthlyLeaderboard.map(({ monthKey, month, ranked }) => (
-              <div key={monthKey} className="border rounded-lg shadow-sm overflow-hidden">
-                <div className="bg-blue-600 text-white px-4 py-2 font-semibold">{month}</div>
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="px-4 py-2 text-left">Rank</th>
-                      <th className="px-4 py-2 text-left">Student</th>
-                      <th className="px-4 py-2 text-center">Attended</th>
-                      <th className="px-4 py-2 text-center">%</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ranked.map((s, i) => (
-                      <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-4 py-2 font-bold text-lg">{MEDALS[i]}</td>
-                        <td className="px-4 py-2 font-medium">{s.name}</td>
-                        <td className="px-4 py-2 text-center">{s.attended}</td>
-                        <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
-                          {s.percentage}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Overall Leaderboard */}
-        <section id="section-leaderboard">
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Overall Leaderboard</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left min-w-[60px]">Rank</th>
-                  <th className="px-4 py-2 text-left min-w-[120px]">Student</th>
-                  <th className="px-4 py-2 text-center min-w-[130px]">Classes Attended</th>
-                  <th className="px-4 py-2 text-center min-w-[120px]">Attendance %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentStats.filter(s => !INSTRUCTORS.includes(s.name)).map((s, i) => (
-                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2 font-bold text-lg">
-                      {i < 3 ? MEDALS[i] : i + 1}
-                    </td>
-                    <td className="px-4 py-2 font-medium">{s.name}</td>
-                    <td className="px-4 py-2 text-center">{s.attended}</td>
-                    <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
-                      {s.percentage}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Student Statistics */}
-        <section id="section-student-stats">
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Student Statistics</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Rank</th>
-                  <th className="px-4 py-2 text-left">Student</th>
-                  <th className="px-4 py-2 text-center">Classes Attended</th>
-                  <th className="px-4 py-2 text-center">Classes Held</th>
-                  <th className="px-4 py-2 text-center">Attendance %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentStats.map((s, i) => (
-                  <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2">{i + 1}</td>
-                    <td className="px-4 py-2 font-medium">{s.name}</td>
-                    <td className="px-4 py-2 text-center">{s.attended}</td>
-                    <td className="px-4 py-2 text-center">{s.total}</td>
-                    <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
-                      {s.percentage}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Monthly Summary */}
-        <section id="section-monthly-summary">
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Monthly Summary</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Month</th>
-                  <th className="px-4 py-2 text-center">Total Attendance</th>
-                  <th className="px-4 py-2 text-center">Classes Held</th>
-                  <th className="px-4 py-2 text-center">Avg per Class</th>
-                </tr>
-              </thead>
-              <tbody>
-                {monthlySummary.map((m, i) => (
-                  <tr key={m.monthKey} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-2 font-medium">{m.month}</td>
-                    <td className="px-4 py-2 text-center">{m.totalAttendance}</td>
-                    <td className="px-4 py-2 text-center">{m.classesHeld}</td>
-                    <td className="px-4 py-2 text-center">{m.avgPerClass}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Student Attendance by Month */}
-        <section id="section-by-month">
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Student Attendance by Month</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Student</th>
-                  {months.map(m => (
-                    <th key={m} className="px-4 py-2 text-center">{getMonthLabel(m)}</th>
-                  ))}
-                  <th className="px-4 py-2 text-center font-bold">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentMonthly
-                  .sort((a, b) => {
-                    const totalA = Object.values(a.months).reduce((sum, m) => sum + m.attended, 0);
-                    const totalB = Object.values(b.months).reduce((sum, m) => sum + m.attended, 0);
-                    return totalB - totalA;
-                  })
-                  .map((s, i) => {
-                    const total = Object.values(s.months).reduce((sum, m) => sum + m.attended, 0);
-                    return (
-                      <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-4 py-2 font-medium">{s.name}</td>
-                        {months.map(m => (
-                          <td key={m} className="px-4 py-2 text-center">
-                            {s.months[m] ? `${s.months[m].attended}/${s.months[m].total}` : '-'}
-                          </td>
-                        ))}
-                        <td className="px-4 py-2 text-center font-bold">{total}</td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {activeSection
+          ? allSections[activeSection]
+          : Object.values(allSections)
+        }
       </div>
     </div>
   );

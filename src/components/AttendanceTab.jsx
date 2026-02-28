@@ -4,20 +4,24 @@ import { countPresent } from '../utils/statistics';
 
 export default function AttendanceTab({ students, attendance, updateAttendance }) {
   const dates = useMemo(() => generateDates(), []);
-  const [jumpMonth, setJumpMonth] = useState('');
+  const [activeMonth, setActiveMonth] = useState('');
 
-  // Unique months in date order, with the first date of each month
   const monthOptions = useMemo(() => {
     const seen = new Set();
     return dates.reduce((acc, date) => {
       const mk = getMonthKey(date);
       if (!seen.has(mk)) {
         seen.add(mk);
-        acc.push({ monthKey: mk, label: getMonthLabel(mk), firstDate: date });
+        acc.push({ monthKey: mk, label: getMonthLabel(mk) });
       }
       return acc;
     }, []);
   }, [dates]);
+
+  const visibleDates = useMemo(() =>
+    activeMonth ? dates.filter(d => getMonthKey(d) === activeMonth) : dates,
+    [dates, activeMonth]
+  );
 
   const toggleAttendance = (date, student) => {
     const newAtt = { ...attendance };
@@ -34,29 +38,32 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
     return 'cell-empty';
   };
 
-  const handleJump = (e) => {
-    const id = e.target.value;
-    if (!id) return;
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setJumpMonth('');
-  };
-
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
         <p className="text-sm text-gray-600">
           Click cells to toggle: 0 (Absent) &harr; 1 (Present)
         </p>
-        <select
-          value={jumpMonth}
-          onChange={handleJump}
-          className="px-3 py-2 border rounded-lg text-sm bg-white"
-        >
-          <option value="">Jump to month…</option>
-          {monthOptions.map(m => (
-            <option key={m.monthKey} value={`att-month-${m.monthKey}`}>{m.label}</option>
-          ))}
-        </select>
+        <div className="flex gap-2 items-center">
+          <select
+            value={activeMonth}
+            onChange={e => setActiveMonth(e.target.value)}
+            className="px-3 py-2 border rounded-lg text-sm bg-white"
+          >
+            <option value="">All months</option>
+            {monthOptions.map(m => (
+              <option key={m.monthKey} value={m.monthKey}>{m.label}</option>
+            ))}
+          </select>
+          {activeMonth && (
+            <button
+              onClick={() => setActiveMonth('')}
+              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              ← Back
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto border rounded-lg shadow-sm">
@@ -71,17 +78,13 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
             </tr>
           </thead>
           <tbody>
-            {dates.map((date, i) => {
-              const mk = getMonthKey(date);
-              const isFirstOfMonth = monthOptions.find(m => m.firstDate === date);
+            {visibleDates.map((date, i) => {
               const dayData = attendance[date] || {};
               const total = countPresent(date, attendance);
               const hasData = Object.keys(dayData).length > 0;
-
               return (
                 <tr
                   key={date}
-                  id={isFirstOfMonth ? `att-month-${mk}` : undefined}
                   className={`border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                 >
                   <td className="px-3 py-2 font-medium whitespace-nowrap sticky left-0 bg-inherit z-10">
