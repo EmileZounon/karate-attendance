@@ -10,6 +10,7 @@ import {
 import { downloadPDF } from '../utils/pdfExport';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
+const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function AnalyticsTab({ students, attendance }) {
   const dates = useMemo(() => generateDates(), []);
@@ -141,7 +142,7 @@ export default function AnalyticsTab({ students, attendance }) {
                 </tr>
               </thead>
               <tbody>
-                {studentStats.map((s, i) => (
+                {studentStats.filter(s => !INSTRUCTORS.includes(s.name)).map((s, i) => (
                   <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-2 font-bold text-lg">
                       {i < 3 ? MEDALS[i] : i + 1}
