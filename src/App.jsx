@@ -37,17 +37,13 @@ export default function App() {
     setData({ ...imported, savedAt: new Date().toISOString() });
   };
 
-  // All students sorted alphabetically (for ManageStudentsTab — includes instructors)
   const allStudents = useMemo(
     () => [...data.students].sort((a, b) => a.localeCompare(b)),
     [data.students]
   );
 
-  // Students with instructors excluded (for Attendance, Analytics, Charts)
-  const sortedStudents = useMemo(
-    () => [...data.students].filter(s => !INSTRUCTORS.includes(s)).sort((a, b) => a.localeCompare(b)),
-    [data.students]
-  );
+  // All students sorted — instructors included in all tabs
+  const sortedStudents = allStudents;
 
   const savedTime = data.savedAt
     ? new Date(data.savedAt).toLocaleString()
