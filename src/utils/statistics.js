@@ -75,6 +75,37 @@ export const calculateStudentMonthly = (students, dates, attendance) => {
   });
 };
 
+// Calculate current and longest attendance streaks per student
+export const calculateStreaks = (students, dates, attendance) => {
+  const classesHeld = getClassesHeld(dates, attendance).sort();
+
+  return students.map(student => {
+    // Longest streak: single forward pass
+    let longestStreak = 0;
+    let tempStreak = 0;
+    for (const date of classesHeld) {
+      if (attendance[date]?.[student] === 1) {
+        tempStreak++;
+        if (tempStreak > longestStreak) longestStreak = tempStreak;
+      } else {
+        tempStreak = 0;
+      }
+    }
+
+    // Current streak: count consecutive presences from the most recent class backwards
+    let currentStreak = 0;
+    for (let i = classesHeld.length - 1; i >= 0; i--) {
+      if (attendance[classesHeld[i]]?.[student] === 1) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+
+    return { name: student, currentStreak, longestStreak };
+  }).sort((a, b) => b.currentStreak - a.currentStreak || b.longestStreak - a.longestStreak);
+};
+
 // Count present students for a given date
 export const countPresent = (date, attendance) => {
   const dayData = attendance[date] || {};

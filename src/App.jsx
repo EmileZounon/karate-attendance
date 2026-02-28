@@ -7,6 +7,7 @@ import ChartsTab from './components/ChartsTab';
 import ManageStudentsTab from './components/ManageStudentsTab';
 
 const TABS = ['Attendance', 'Analytics', 'Charts', 'Manage Students'];
+const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Attendance');
@@ -36,8 +37,15 @@ export default function App() {
     setData({ ...imported, savedAt: new Date().toISOString() });
   };
 
-  const sortedStudents = useMemo(
+  // All students sorted alphabetically (for ManageStudentsTab — includes instructors)
+  const allStudents = useMemo(
     () => [...data.students].sort((a, b) => a.localeCompare(b)),
+    [data.students]
+  );
+
+  // Students with instructors excluded (for Attendance, Analytics, Charts)
+  const sortedStudents = useMemo(
+    () => [...data.students].filter(s => !INSTRUCTORS.includes(s)).sort((a, b) => a.localeCompare(b)),
     [data.students]
   );
 
@@ -73,7 +81,7 @@ export default function App() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+            className={`text-sm px-2 py-1 sm:px-5 sm:py-2 rounded-lg font-medium transition-colors ${
               activeTab === tab ? 'tab-active' : 'tab-inactive'
             }`}
           >
@@ -104,7 +112,7 @@ export default function App() {
         )}
         {activeTab === 'Manage Students' && (
           <ManageStudentsTab
-            students={sortedStudents}
+            students={allStudents}
             attendance={data.attendance}
             updateStudents={updateStudents}
             updateAttendance={updateAttendance}

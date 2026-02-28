@@ -36,17 +36,21 @@ export default function ChartsTab({ students, attendance }) {
     [classesHeld, attendance]
   );
 
-  // Data for stacked bar chart (student by month)
+  // Data for per-month student attendance charts
   const months = monthlySummary.map(m => m.monthKey);
-  const stackedData = useMemo(() => {
-    return months.map(monthKey => {
-      const row = { month: getMonthLabel(monthKey).split(' ')[0] }; // "January" -> "January"
-      students.forEach(student => {
+  const monthlyStudentData = useMemo(() => {
+    return months.map(monthKey => ({
+      monthKey,
+      label: getMonthLabel(monthKey),
+      data: students.map((student, i) => {
         const sm = studentMonthly.find(s => s.name === student);
-        row[student] = sm?.months[monthKey]?.attended || 0;
-      });
-      return row;
-    });
+        return {
+          name: student,
+          attended: sm?.months[monthKey]?.attended || 0,
+          color: COLORS[i % COLORS.length],
+        };
+      }).sort((a, b) => b.attended - a.attended),
+    }));
   }, [months, students, studentMonthly]);
 
   return (
@@ -61,10 +65,11 @@ export default function ChartsTab({ students, attendance }) {
       </div>
 
       <div id="charts-content" className="space-y-10 bg-white p-6 rounded-lg">
-        {/* Chart 1: Attendance by Student */}
+        {/* Chart 1: Total Attendance by Student */}
         <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Attendance by Student</h2>
-          <ResponsiveContainer width="100%" height={400}>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Total Attendance by Student</h2>
+          <div className="h-64 sm:h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={studentStats} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
@@ -77,12 +82,36 @@ export default function ChartsTab({ students, attendance }) {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </section>
 
-        {/* Chart 2: Monthly Total Attendance */}
+        {/* Per-month student attendance charts */}
+        {monthlyStudentData.map(({ monthKey, label, data }) => (
+          <section key={monthKey}>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{label} — Attendance by Student</h2>
+            <div className="h-64 sm:h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="attended" name="Classes Attended">
+                  {data.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            </div>
+          </section>
+        ))}
+
+        {/* Chart 3: Monthly Total Attendance */}
         <section>
           <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Total Attendance</h2>
-          <ResponsiveContainer width="100%" height={350}>
+          <div className="h-56 sm:h-[350px]">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlySummary} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -92,12 +121,14 @@ export default function ChartsTab({ students, attendance }) {
               <Bar dataKey="classesHeld" name="Classes Held" fill="#16a34a" />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </section>
 
-        {/* Chart 3: Students per Class Over Time */}
+        {/* Chart 4: Students per Class Over Time */}
         <section>
           <h2 className="text-xl font-bold text-gray-800 mb-4">Students per Class Over Time</h2>
-          <ResponsiveContainer width="100%" height={350}>
+          <div className="h-56 sm:h-[350px]">
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart data={classAttendanceData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
@@ -113,32 +144,7 @@ export default function ChartsTab({ students, attendance }) {
               />
             </LineChart>
           </ResponsiveContainer>
-        </section>
-
-        {/* Chart 4: Student Attendance by Month (Stacked) */}
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Student Attendance by Month</h2>
-          <ResponsiveContainer width="100%" height={500}>
-            <BarChart
-              data={stackedData}
-              layout="vertical"
-              margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="month" width={80} />
-              <Tooltip />
-              <Legend />
-              {students.map((student, i) => (
-                <Bar
-                  key={student}
-                  dataKey={student}
-                  stackId="a"
-                  fill={COLORS[i % COLORS.length]}
-                />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
+          </div>
         </section>
       </div>
     </div>

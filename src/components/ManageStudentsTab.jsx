@@ -104,7 +104,7 @@ export default function ManageStudentsTab({
         <h2 className="text-lg font-bold mb-3">
           Current Students ({students.length})
         </h2>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {students.map(name => (
             <div
               key={name}
