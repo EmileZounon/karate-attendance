@@ -22,6 +22,26 @@ export default function AnalyticsTab({ students, attendance }) {
   const months = monthlySummary.map(m => m.monthKey);
   const [selectedMonth, setSelectedMonth] = useState(() => months[months.length - 1] || '');
 
+  // Top 3 students per month (instructors excluded)
+  const monthlyLeaderboard = useMemo(() =>
+    monthlySummary.map(({ monthKey, month }) => {
+      const ranked = studentMonthly
+        .filter(s => !INSTRUCTORS.includes(s.name))
+        .map(s => ({
+          name: s.name,
+          attended: s.months[monthKey]?.attended || 0,
+          total: s.months[monthKey]?.total || 0,
+          percentage: s.months[monthKey]?.total > 0
+            ? parseFloat((s.months[monthKey].attended / s.months[monthKey].total * 100).toFixed(1))
+            : 0,
+        }))
+        .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name))
+        .slice(0, 3);
+      return { monthKey, month, ranked };
+    }),
+    [monthlySummary, studentMonthly]
+  );
+
   const selectedMonthlySummary = monthlySummary.find(m => m.monthKey === selectedMonth);
   const selectedStudentMonthly = studentMonthly
     .map(s => ({
@@ -156,6 +176,40 @@ export default function AnalyticsTab({ students, attendance }) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        {/* Monthly Leaderboards */}
+        <section>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Leaderboards</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {monthlyLeaderboard.map(({ monthKey, month, ranked }) => (
+              <div key={monthKey} className="border rounded-lg shadow-sm overflow-hidden">
+                <div className="bg-blue-600 text-white px-4 py-2 font-semibold">{month}</div>
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">Rank</th>
+                      <th className="px-4 py-2 text-left">Student</th>
+                      <th className="px-4 py-2 text-center">Attended</th>
+                      <th className="px-4 py-2 text-center">%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ranked.map((s, i) => (
+                      <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-4 py-2 font-bold text-lg">{MEDALS[i]}</td>
+                        <td className="px-4 py-2 font-medium">{s.name}</td>
+                        <td className="px-4 py-2 text-center">{s.attended}</td>
+                        <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>
+                          {s.percentage}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
         </section>
 
