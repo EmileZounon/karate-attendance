@@ -11,14 +11,7 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
     else newAtt[date] = { ...newAtt[date] };
 
     const current = newAtt[date][student];
-    if (current === undefined || current === null) {
-      newAtt[date][student] = 1;   // Empty -> Present
-    } else if (current === 1) {
-      newAtt[date][student] = 0;   // Present -> Absent
-    } else {
-      const { [student]: _, ...rest } = newAtt[date];
-      newAtt[date] = rest;          // Absent -> Empty
-    }
+    newAtt[date][student] = current === 1 ? 0 : 1;  // Toggle: 1 (Present) <-> 0 (Absent)
     updateAttendance(newAtt);
   };
 
@@ -31,7 +24,7 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
   return (
     <div>
       <p className="text-sm text-gray-600 mb-3">
-        Click cells to toggle: Empty &rarr; 1 (Present) &rarr; 0 (Absent) &rarr; Empty
+        Click cells to toggle: 0 (Absent) &harr; 1 (Present)
       </p>
 
       <div className="overflow-x-auto border rounded-lg shadow-sm">
