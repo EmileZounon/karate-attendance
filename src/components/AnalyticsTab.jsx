@@ -242,14 +242,6 @@ export default function AnalyticsTab({ students, attendance }) {
               <option key={s.id} value={s.id}>{s.label}</option>
             ))}
           </select>
-          {activeSection && (
-            <button
-              onClick={() => setActiveSection('')}
-              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              ← Back
-            </button>
-          )}
         </div>
         <div className="flex flex-wrap gap-2 items-center">
           <button

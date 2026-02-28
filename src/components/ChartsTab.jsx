@@ -165,14 +165,6 @@ export default function ChartsTab({ students, attendance }) {
               <option key={c.id} value={c.id}>{c.label}</option>
             ))}
           </select>
-          {activeChart && (
-            <button
-              onClick={() => setActiveChart('')}
-              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              ← Back
-            </button>
-          )}
         </div>
         <button
           onClick={() => downloadPDF('charts-content', 'Karate_Charts_Report', 'landscape')}

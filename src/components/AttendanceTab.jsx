@@ -55,14 +55,6 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
               <option key={m.monthKey} value={m.monthKey}>{m.label}</option>
             ))}
           </select>
-          {activeMonth && (
-            <button
-              onClick={() => setActiveMonth('')}
-              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              ← Back
-            </button>
-          )}
         </div>
       </div>
 
