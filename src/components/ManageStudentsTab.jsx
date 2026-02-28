@@ -11,6 +11,35 @@ export default function ManageStudentsTab({
   data,
 }) {
   const [newName, setNewName] = useState('');
+  const [editingName, setEditingName] = useState(null);
+  const [editValue, setEditValue] = useState('');
+
+  const startEdit = (name) => {
+    setEditingName(name);
+    setEditValue(name);
+  };
+
+  const saveEdit = () => {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === editingName) { setEditingName(null); return; }
+    if (students.includes(trimmed)) {
+      alert(`"${trimmed}" already exists.`);
+      return;
+    }
+    // Update student list
+    updateStudents(students.map(s => s === editingName ? trimmed : s));
+    // Migrate attendance records to new name
+    const newAtt = { ...attendance };
+    Object.keys(newAtt).forEach(date => {
+      if (newAtt[date][editingName] !== undefined) {
+        const val = newAtt[date][editingName];
+        const { [editingName]: _, ...rest } = newAtt[date];
+        newAtt[date] = { ...rest, [trimmed]: val };
+      }
+    });
+    updateAttendance(newAtt);
+    setEditingName(null);
+  };
 
   const addStudent = () => {
     const name = newName.trim();
@@ -106,17 +135,26 @@ export default function ManageStudentsTab({
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {students.map(name => (
-            <div
-              key={name}
-              className="flex items-center justify-between p-2 bg-gray-50 rounded"
-            >
-              <span className="font-medium">{name}</span>
-              <button
-                onClick={() => removeStudent(name)}
-                className="text-red-500 hover:text-red-700 text-sm font-medium"
-              >
-                Remove
-              </button>
+            <div key={name} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              {editingName === name ? (
+                <>
+                  <input
+                    autoFocus
+                    value={editValue}
+                    onChange={e => setEditValue(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingName(null); }}
+                    className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button onClick={saveEdit} className="text-green-600 hover:text-green-800 text-sm font-medium">Save</button>
+                  <button onClick={() => setEditingName(null)} className="text-gray-400 hover:text-gray-600 text-sm">Cancel</button>
+                </>
+              ) : (
+                <>
+                  <span className="flex-1 font-medium">{name}</span>
+                  <button onClick={() => startEdit(name)} className="text-blue-500 hover:text-blue-700 text-sm font-medium">Edit</button>
+                  <button onClick={() => removeStudent(name)} className="text-red-500 hover:text-red-700 text-sm font-medium">Remove</button>
+                </>
+              )}
             </div>
           ))}
         </div>

@@ -66,14 +66,14 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
         </div>
       </div>
 
-      <div className="overflow-x-auto border rounded-lg shadow-sm">
+      <div className="overflow-auto max-h-[75vh] border rounded-lg shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-blue-600 text-white">
-              <th className="px-3 py-2 text-left sticky left-0 bg-blue-600 z-10">Date</th>
-              <th className="px-3 py-2 text-center font-bold">Total</th>
+              <th className="px-3 py-2 text-left sticky left-0 top-0 bg-blue-600 z-30">Date</th>
+              <th className="px-3 py-2 text-center font-bold sticky top-0 bg-blue-600 z-20">Total</th>
               {students.map(s => (
-                <th key={s} className="px-3 py-2 text-center whitespace-nowrap">{s}</th>
+                <th key={s} className="px-3 py-2 text-center whitespace-nowrap sticky top-0 bg-blue-600 z-20">{s}</th>
               ))}
             </tr>
           </thead>
