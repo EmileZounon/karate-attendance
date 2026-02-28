@@ -4,7 +4,6 @@ import {
   calculateStudentStats,
   calculateMonthlySummary,
   calculateStudentMonthly,
-  calculateStreaks,
   getPctClass,
 } from '../utils/statistics';
 import { downloadPDF } from '../utils/pdfExport';
@@ -17,8 +16,6 @@ export default function AnalyticsTab({ students, attendance }) {
   const studentStats = useMemo(() => calculateStudentStats(students, dates, attendance), [students, dates, attendance]);
   const monthlySummary = useMemo(() => calculateMonthlySummary(dates, attendance), [dates, attendance]);
   const studentMonthly = useMemo(() => calculateStudentMonthly(students, dates, attendance), [students, dates, attendance]);
-  const streaks = useMemo(() => calculateStreaks(students, dates, attendance), [students, dates, attendance]);
-
   const months = monthlySummary.map(m => m.monthKey);
   const [selectedMonth, setSelectedMonth] = useState(() => months[months.length - 1] || '');
 
@@ -239,44 +236,6 @@ export default function AnalyticsTab({ students, attendance }) {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Hot Streaks */}
-        <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Hot Streaks 🔥</h2>
-          <div className="overflow-x-auto border rounded-lg shadow-sm">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Rank</th>
-                  <th className="px-4 py-2 text-left">Student</th>
-                  <th className="px-4 py-2 text-center">Current Streak 🔥</th>
-                  <th className="px-4 py-2 text-center">Longest Streak</th>
-                </tr>
-              </thead>
-              <tbody>
-                {streaks.map((s, i) => {
-                  const isHot = s.currentStreak >= 3;
-                  const isCold = s.currentStreak === 0;
-                  const rowClass = isHot
-                    ? 'bg-green-50'
-                    : isCold
-                      ? 'text-gray-400'
-                      : i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                  return (
-                    <tr key={s.name} className={rowClass}>
-                      <td className="px-4 py-2">{i + 1}</td>
-                      <td className="px-4 py-2 font-medium">{s.name}</td>
-                      <td className={`px-4 py-2 text-center font-semibold ${isHot ? 'text-green-700' : ''}`}>
-                        {s.currentStreak}
-                      </td>
-                      <td className="px-4 py-2 text-center">{s.longestStreak}</td>
-                    </tr>
-                  );
-                })}
               </tbody>
             </table>
           </div>
