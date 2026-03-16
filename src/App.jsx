@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFirestore } from './hooks/useFirestore';
 import { defaultStudents, defaultAttendance } from './data/defaults';
+import { migrateToSubcollections } from './utils/migrateFirestore';
 import PasswordGate from './components/PasswordGate';
 import AttendanceTab from './components/AttendanceTab';
 import AnalyticsTab from './components/AnalyticsTab';
@@ -11,6 +12,10 @@ const TABS = ['Attendance', 'Analytics', 'Charts', 'Manage Students'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function App() {
+  // Run one-time migration from single-doc to subcollections
+  useEffect(() => {
+    migrateToSubcollections();
+  }, []);
   const [activeTab, setActiveTab] = useState('Attendance');
   const [data, setData, loading, error] = useFirestore({
     students: defaultStudents,
@@ -24,14 +29,6 @@ export default function App() {
 
   const updateAttendance = (attendance) => {
     setData(prev => ({ ...prev, attendance, savedAt: new Date().toISOString() }));
-  };
-
-  const resetToDefaults = () => {
-    setData({
-      students: defaultStudents,
-      attendance: defaultAttendance,
-      savedAt: new Date().toISOString(),
-    });
   };
 
   const importData = (imported) => {
@@ -114,7 +111,6 @@ export default function App() {
             attendance={data.attendance}
             updateStudents={updateStudents}
             updateAttendance={updateAttendance}
-            resetToDefaults={resetToDefaults}
             importData={importData}
             data={data}
           />

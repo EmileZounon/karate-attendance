@@ -3,13 +3,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Only allow access to the specific document the app uses
+    // Main document: students list and metadata
     match /attendance-data/main {
       allow read: if true;
-
-      // Allow writes but limit document size to prevent abuse
       allow write: if request.resource.data.keys().size() > 0
                    && request.resource.size() < 1048576; // 1MB max
+    }
+
+    // Monthly attendance subcollection
+    match /attendance-data/main/months/{monthId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().size() > 0
+                   && request.resource.size() < 1048576;
+    }
+
+    // Automatic backups subcollection
+    match /attendance-data/main/backups/{backupId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().size() > 0
+                    && request.resource.size() < 1048576;
+      // Backups are immutable — no updates or deletes
     }
 
     // Deny access to everything else

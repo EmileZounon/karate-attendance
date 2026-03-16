@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import ImportWordDoc from './ImportWordDoc';
+import { getBackups } from '../hooks/useFirestore';
 
 export default function ManageStudentsTab({
   students,
   attendance,
   updateStudents,
   updateAttendance,
-  resetToDefaults,
   importData,
   data,
 }) {
   const [newName, setNewName] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [backups, setBackups] = useState(null);
+  const [loadingBackups, setLoadingBackups] = useState(false);
 
   const startEdit = (name) => {
     setEditingName(name);
@@ -100,9 +102,35 @@ export default function ManageStudentsTab({
     reader.readAsText(file);
   };
 
-  const handleReset = () => {
-    if (!confirm('Reset all data to defaults? This cannot be undone.')) return;
-    resetToDefaults();
+  const loadBackups = async () => {
+    setLoadingBackups(true);
+    try {
+      const list = await getBackups(20);
+      setBackups(list);
+    } catch (err) {
+      alert('Error loading backups: ' + err.message);
+    }
+    setLoadingBackups(false);
+  };
+
+  const restoreBackup = (backup) => {
+    if (!confirm(`Restore backup from ${backup.backupAt ? new Date(backup.backupAt).toLocaleString() : 'unknown date'}? This will replace current data.`)) return;
+    importData({
+      students: backup.students,
+      attendance: backup.attendance,
+    });
+    alert('Backup restored successfully!');
+    setBackups(null);
+  };
+
+  const formatBackupDate = (backup) => {
+    if (backup.backupAt) return new Date(backup.backupAt).toLocaleString();
+    if (backup.timestamp) return new Date(backup.timestamp.seconds * 1000).toLocaleString();
+    return 'Unknown date';
+  };
+
+  const countAttendanceDates = (backup) => {
+    return Object.keys(backup.attendance || {}).length;
   };
 
   return (
@@ -188,18 +216,47 @@ export default function ManageStudentsTab({
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-600 file:text-white hover:file:bg-gray-700"
             />
           </div>
-          <div className="pt-3 border-t">
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Reset to Defaults
-            </button>
-            <p className="text-xs text-gray-500 mt-1">
-              Restores original 16 students and January 2026 attendance data.
-            </p>
-          </div>
         </div>
+      </section>
+
+      {/* Backup History */}
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">Backup History</h2>
+        <p className="text-sm text-gray-600 mb-3">
+          Backups are created automatically when data changes. You can restore any previous version.
+        </p>
+        <button
+          onClick={loadBackups}
+          disabled={loadingBackups}
+          className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition-colors disabled:opacity-50"
+        >
+          {loadingBackups ? 'Loading...' : 'View Backups'}
+        </button>
+
+        {backups && backups.length === 0 && (
+          <p className="mt-3 text-sm text-gray-500">No backups found yet. Backups are created automatically when you make changes.</p>
+        )}
+
+        {backups && backups.length > 0 && (
+          <div className="mt-3 space-y-2 max-h-64 overflow-auto">
+            {backups.map((backup) => (
+              <div key={backup.id} className="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                <div>
+                  <p className="text-sm font-medium">{formatBackupDate(backup)}</p>
+                  <p className="text-xs text-gray-500">
+                    {backup.students?.length || 0} students, {countAttendanceDates(backup)} class dates
+                  </p>
+                </div>
+                <button
+                  onClick={() => restoreBackup(backup)}
+                  className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                >
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
