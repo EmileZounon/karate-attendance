@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFirestore } from './hooks/useFirestore';
 import { defaultStudents, defaultAttendance } from './data/defaults';
+import PasswordGate from './components/PasswordGate';
 import AttendanceTab from './components/AttendanceTab';
 import AnalyticsTab from './components/AnalyticsTab';
 import ChartsTab from './components/ChartsTab';
@@ -61,6 +62,7 @@ export default function App() {
   }
 
   return (
+    <PasswordGate>
     <div className="max-w-[1400px] mx-auto p-4">
       <header className="text-center mb-6">
         <h1 className="text-3xl font-bold text-blue-800">
@@ -119,5 +121,6 @@ export default function App() {
         )}
       </main>
     </div>
+    </PasswordGate>
   );
 }

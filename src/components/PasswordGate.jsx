@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const TEAM_PASSWORD = 'Karatediplomacy@2026';
+const TEAM_PASSWORD = 'Cassiano';
 
 const ERROR_MESSAGES = [
   'Keikoku. Try again.',
