@@ -116,8 +116,8 @@ export default function AnalyticsTab({ students, attendance }) {
               <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-4 py-2 font-bold text-lg">{i < 3 ? MEDALS[i] : i + 1}</td>
                 <td className="px-4 py-2 font-medium">{s.name}</td>
-                <td className="px-4 py-2 text-center">{s.attended}</td>
-                <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>{s.percentage}%</td>
+                <td className="px-4 py-2 text-center text-green-600 font-semibold">{s.attended}</td>
+                <td className="px-4 py-2 text-center text-indigo-600 font-semibold">{s.percentage}%</td>
               </tr>
             ))}
           </tbody>
@@ -136,6 +136,7 @@ export default function AnalyticsTab({ students, attendance }) {
               <th className="px-4 py-2 text-left">Rank</th>
               <th className="px-4 py-2 text-left">Student</th>
               <th className="px-4 py-2 text-center">Classes Attended</th>
+              <th className="px-4 py-2 text-center">Classes Missed</th>
               <th className="px-4 py-2 text-center">Classes Held</th>
               <th className="px-4 py-2 text-center">Attendance %</th>
             </tr>
@@ -145,9 +146,10 @@ export default function AnalyticsTab({ students, attendance }) {
               <tr key={s.name} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-4 py-2">{i + 1}</td>
                 <td className="px-4 py-2 font-medium">{s.name}</td>
-                <td className="px-4 py-2 text-center">{s.attended}</td>
-                <td className="px-4 py-2 text-center">{s.total}</td>
-                <td className={`px-4 py-2 text-center ${getPctClass(s.percentage)}`}>{s.percentage}%</td>
+                <td className="px-4 py-2 text-center text-green-600 font-semibold">{s.attended}</td>
+                <td className="px-4 py-2 text-center text-red-600 font-semibold">{s.total - s.attended}</td>
+                <td className="px-4 py-2 text-center text-blue-700 font-semibold">{s.total}</td>
+                <td className="px-4 py-2 text-center text-indigo-600 font-semibold">{s.percentage}%</td>
               </tr>
             ))}
           </tbody>
