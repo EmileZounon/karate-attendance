@@ -1,15 +1,20 @@
-// Generate all Thursday and Sunday dates for Jan-Jun 2026
+// Extra practice dates (not on regular Thu/Sun schedule)
+const EXTRA_DATES = [
+  '2026-04-04', // Sat — extra practice
+];
+
+// Generate all Thursday and Sunday dates for Jan-Jun 2026, plus extra practices
 export const generateDates = () => {
   const dates = [];
   for (let month = 0; month <= 5; month++) {
     for (let day = 1; day <= 31; day++) {
       const d = new Date(2026, month, day);
       if (d.getMonth() !== month) break;
-      // Thursday = 4, Sunday = 0
-      if (d.getDay() === 4 || d.getDay() === 0) {
+      const dateStr = `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      // Thursday = 4, Sunday = 0, or an extra date
+      if (d.getDay() === 4 || d.getDay() === 0 || EXTRA_DATES.includes(dateStr)) {
         // Skip Jan 1 (New Year's Day - no class)
         if (month === 0 && day === 1) continue;
-        const dateStr = `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         dates.push(dateStr);
       }
     }
