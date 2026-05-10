@@ -1,6 +1,8 @@
 // Extra practice dates (not on regular Thu/Sun schedule)
 const EXTRA_DATES = [
   '2026-04-04', // Sat — extra practice
+  '2026-05-08', // Fri — Jerry Sensei visit practice
+  '2026-05-09', // Sat — Jerry Sensei visit practice
 ];
 
 // Generate all Thursday and Sunday dates for Jan-Jun 2026, plus extra practices
