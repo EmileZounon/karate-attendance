@@ -5,16 +5,23 @@ const EXTRA_DATES = [
   '2026-05-09', // Sat — Jerry Sensei visit practice
 ];
 
-// Generate all Thursday and Sunday dates for Jan-Jun 2026, plus extra practices
+// Tuesday classes were added to the schedule starting this date (summer 2026).
+const TUESDAY_START = '2026-05-26';
+
+// Generate regular class dates for Jan–Aug 2026: Thursdays + Sundays all year,
+// plus Tuesdays from 2026-05-26 onward (summer), plus one-off extra practices.
 export const generateDates = () => {
   const dates = [];
-  for (let month = 0; month <= 5; month++) {
+  for (let month = 0; month <= 7; month++) {
     for (let day = 1; day <= 31; day++) {
       const d = new Date(2026, month, day);
       if (d.getMonth() !== month) break;
       const dateStr = `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      // Thursday = 4, Sunday = 0, or an extra date
-      if (d.getDay() === 4 || d.getDay() === 0 || EXTRA_DATES.includes(dateStr)) {
+      // Thursday = 4, Sunday = 0, Tuesday = 2 (from TUESDAY_START), or an extra date
+      const isThu = d.getDay() === 4;
+      const isSun = d.getDay() === 0;
+      const isTue = d.getDay() === 2 && dateStr >= TUESDAY_START;
+      if (isThu || isSun || isTue || EXTRA_DATES.includes(dateStr)) {
         // Skip Jan 1 (New Year's Day - no class)
         if (month === 0 && day === 1) continue;
         dates.push(dateStr);
