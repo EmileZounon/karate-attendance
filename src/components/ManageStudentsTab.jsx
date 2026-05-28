@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '../firebase';
+import * as XLSX from 'xlsx';
 import ImportWordDoc from './ImportWordDoc';
+import { formatDate, generateDates, getMonthKey, getMonthLabel } from '../utils/dateUtils';
+import { calculateStudentStats, calculateMonthlySummary, calculateStudentMonthly, getClassesHeld } from '../utils/statistics';
 
 export default function ManageStudentsTab({
   students,
   attendance,
   updateStudents,
   updateAttendance,
+  updateBoth,
   resetToDefaults,
   importData,
   data,
@@ -13,6 +19,28 @@ export default function ManageStudentsTab({
   const [newName, setNewName] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [backups, setBackups] = useState([]);
+  const [loadingBackups, setLoadingBackups] = useState(false);
+
+  const loadBackups = async () => {
+    setLoadingBackups(true);
+    try {
+      const backupsRef = collection(db, 'attendance-data', 'main', 'backups');
+      const q = query(backupsRef, orderBy('timestamp', 'desc'), limit(20));
+      const snap = await getDocs(q);
+      setBackups(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Error loading backups:', err);
+    }
+    setLoadingBackups(false);
+  };
+
+  const restoreBackup = (backup) => {
+    const { id, backupAt, timestamp, ...restoreData } = backup;
+    if (!confirm(`Restore backup from ${new Date(backupAt).toLocaleString()}? This will replace all current data.`)) return;
+    importData(restoreData);
+    alert('Backup restored!');
+  };
 
   const startEdit = (name) => {
     setEditingName(name);
@@ -26,9 +54,8 @@ export default function ManageStudentsTab({
       alert(`"${trimmed}" already exists.`);
       return;
     }
-    // Update student list
-    updateStudents(students.map(s => s === editingName ? trimmed : s));
-    // Migrate attendance records to new name
+    // Atomic update: rename in both students and attendance in one write
+    const newStudents = students.map(s => s === editingName ? trimmed : s);
     const newAtt = { ...attendance };
     Object.keys(newAtt).forEach(date => {
       if (newAtt[date][editingName] !== undefined) {
@@ -37,7 +64,7 @@ export default function ManageStudentsTab({
         newAtt[date] = { ...rest, [trimmed]: val };
       }
     });
-    updateAttendance(newAtt);
+    updateBoth(newStudents, newAtt);
     setEditingName(null);
   };
 
@@ -54,8 +81,8 @@ export default function ManageStudentsTab({
 
   const removeStudent = (name) => {
     if (!confirm(`Remove "${name}" and all their attendance records?`)) return;
-    updateStudents(students.filter(s => s !== name));
-    // Also remove from attendance data
+    // Atomic update: remove from both students and attendance in one write
+    const newStudents = students.filter(s => s !== name);
     const newAtt = { ...attendance };
     Object.keys(newAtt).forEach(date => {
       if (newAtt[date][name] !== undefined) {
@@ -63,11 +90,66 @@ export default function ManageStudentsTab({
         newAtt[date] = rest;
       }
     });
-    updateAttendance(newAtt);
+    updateBoth(newStudents, newAtt);
   };
 
   const handleImportStudents = (mergedStudents) => {
     updateStudents(mergedStudents);
+  };
+
+  const exportExcel = () => {
+    const sortedStudents = [...students].sort((a, b) => a.localeCompare(b));
+    const dates = Object.keys(attendance).sort();
+    const allDates = generateDates();
+    const wb = XLSX.utils.book_new();
+
+    // ── Sheet 1: Attendance Grid ──
+    const attRows = dates.map(date => {
+      const dayData = attendance[date] || {};
+      const total = Object.values(dayData).filter(v => v === 1).length;
+      const row = { Date: formatDate(date), Total: total };
+      sortedStudents.forEach(s => {
+        const val = dayData[s];
+        row[s] = val === 1 ? 1 : val === 0 ? 0 : '';
+      });
+      return row;
+    });
+    const totalsRow = { Date: 'TOTAL', Total: '' };
+    sortedStudents.forEach(s => {
+      totalsRow[s] = dates.reduce((sum, date) => {
+        return sum + ((attendance[date] || {})[s] === 1 ? 1 : 0);
+      }, 0);
+    });
+    attRows.push(totalsRow);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(attRows), 'Attendance');
+
+    // ── Sheet 2: Student Stats ──
+    const stats = calculateStudentStats(sortedStudents, allDates, attendance);
+    const studentMonthly = calculateStudentMonthly(sortedStudents, allDates, attendance);
+    const months = [...new Set(getClassesHeld(allDates, attendance).map(getMonthKey))].sort();
+
+    const statsRows = stats.map(s => {
+      const row = { Student: s.name, 'Classes Attended': s.attended, 'Total Classes': s.total, 'Attendance %': s.percentage };
+      const sm = studentMonthly.find(m => m.name === s.name);
+      months.forEach(mk => {
+        row[getMonthLabel(mk)] = sm?.months[mk]?.attended || 0;
+      });
+      return row;
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(statsRows), 'Student Stats');
+
+    // ── Sheet 3: Monthly Summary ──
+    const monthly = calculateMonthlySummary(allDates, attendance);
+    const monthlyRows = monthly.map(m => ({
+      Month: m.month,
+      'Classes Held': m.classesHeld,
+      'Total Attendance': m.totalAttendance,
+      'Avg per Class': m.avgPerClass,
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(monthlyRows), 'Monthly Summary');
+
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `karate-attendance-${today}.xlsx`);
   };
 
   const exportJSON = () => {
@@ -165,11 +247,54 @@ export default function ManageStudentsTab({
         <ImportWordDoc students={students} onImport={handleImportStudents} />
       </section>
 
+      {/* Backup & Restore */}
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">Backup & Restore</h2>
+        <button
+          onClick={loadBackups}
+          disabled={loadingBackups}
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors disabled:opacity-50"
+        >
+          {loadingBackups ? 'Loading...' : 'Load Backups'}
+        </button>
+        {backups.length > 0 && (
+          <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
+            {backups.map(b => (
+              <div key={b.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
+                <div>
+                  <span className="font-medium">{new Date(b.backupAt).toLocaleString()}</span>
+                  <span className="text-gray-500 ml-2">
+                    ({b.students?.length || 0} students, {Object.keys(b.attendance || {}).length} dates)
+                  </span>
+                </div>
+                <button
+                  onClick={() => restoreBackup(b)}
+                  className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors"
+                >
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {backups.length === 0 && !loadingBackups && (
+          <p className="text-xs text-gray-500 mt-2">
+            Auto-backups are created every 5 minutes when you make changes. Click above to check for available backups.
+          </p>
+        )}
+      </section>
+
       {/* Export / Import JSON */}
       <section className="p-4 border rounded-lg bg-white shadow-sm">
         <h2 className="text-lg font-bold mb-3">Data Management</h2>
         <div className="space-y-3">
-          <div>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={exportExcel}
+              className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition-colors"
+            >
+              Export as Excel
+            </button>
             <button
               onClick={exportJSON}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"

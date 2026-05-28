@@ -26,6 +26,11 @@ export default function App() {
     setData(prev => ({ ...prev, attendance, savedAt: new Date().toISOString() }));
   };
 
+  // Atomic update for operations that change both students and attendance together
+  const updateBoth = (students, attendance) => {
+    setData(prev => ({ ...prev, students, attendance, savedAt: new Date().toISOString() }));
+  };
+
   const resetToDefaults = () => {
     setData({
       students: defaultStudents,
@@ -114,6 +119,7 @@ export default function App() {
             attendance={data.attendance}
             updateStudents={updateStudents}
             updateAttendance={updateAttendance}
+            updateBoth={updateBoth}
             resetToDefaults={resetToDefaults}
             importData={importData}
             data={data}

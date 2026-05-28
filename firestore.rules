@@ -12,6 +12,14 @@ service cloud.firestore {
                    && request.resource.size() < 1048576; // 1MB max
     }
 
+    // Automatic backups subcollection
+    match /attendance-data/main/backups/{backupId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().size() > 0
+                    && request.resource.size() < 1048576;
+      // Backups are immutable — no updates or deletes
+    }
+
     // Deny access to everything else
     match /{document=**} {
       allow read, write: if false;
