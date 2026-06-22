@@ -29,10 +29,10 @@ It is **not** just a re-skin of the old app — it's a reimagined, phone-first f
 ## What's new in the Dojo preview
 
 - **Today** (home screen) — opens on today's class: the next session, a recap of the
-  last class with attendance streaks, who's expected, and one big **Take attendance**
-  button. This is the everyday summer-term flow: open it, tap, mark the roll.
+  last class with attendance streaks, who is expected, and one clear **Take attendance**
+  button. This is the everyday summer-term flow: open it and record the roll.
 - **Dan Exam** — celebrates the 2026 JKA grading results (see below).
-- **Awards** — monthly and all-time medals 🥇🥈🥉 for who shows up the most.
+- **Awards** — monthly and all-time medals 🥇🥈🥉 recognizing the most consistent attendance.
   _Instructors (Vazrik, Cassiano) are excluded — they don't compete for attendance awards._
 - **Attendance, Charts, Analytics, Manage Students** — all still here, in the Dojo style.
 
