@@ -1,17 +1,20 @@
 import { useState, useMemo } from 'react';
 import { useFirestore } from './hooks/useFirestore';
 import { defaultStudents, defaultAttendance } from './data/defaults';
+import TodayTab from './components/TodayTab';
 import AttendanceTab from './components/AttendanceTab';
+import GradingTab from './components/GradingTab';
+import AwardsTab from './components/AwardsTab';
 import AnalyticsTab from './components/AnalyticsTab';
 import ChartsTab from './components/ChartsTab';
 import ManageStudentsTab from './components/ManageStudentsTab';
 import PasswordGate from './components/PasswordGate';
 
-const TABS = ['Attendance', 'Analytics', 'Charts', 'Manage Students'];
+const TABS = ['Today', 'Attendance', 'Grading', 'Awards', 'Charts', 'Analytics', 'Manage Students'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('Attendance');
+  const [activeTab, setActiveTab] = useState('Today');
   const [data, setData, loading, error] = useFirestore({
     students: defaultStudents,
     attendance: defaultAttendance,
@@ -83,7 +86,7 @@ export default function App() {
         </p>
       </header>
 
-      <nav className="flex justify-center gap-2 mb-6 no-print">
+      <nav className="flex flex-wrap justify-center gap-2 mb-6 no-print">
         {TABS.map(tab => (
           <button
             key={tab}
@@ -98,12 +101,31 @@ export default function App() {
       </nav>
 
       <main>
+        {activeTab === 'Today' && (
+          <TodayTab
+            students={sortedStudents}
+            attendance={data.attendance}
+            onTakeAttendance={() => setActiveTab('Attendance')}
+          />
+        )}
         {activeTab === 'Attendance' && (
           <AttendanceTab
             students={sortedStudents}
             attendance={data.attendance}
             updateAttendance={updateAttendance}
             updateBoth={updateBoth}
+          />
+        )}
+        {activeTab === 'Grading' && (
+          <GradingTab
+            students={sortedStudents}
+            attendance={data.attendance}
+          />
+        )}
+        {activeTab === 'Awards' && (
+          <AwardsTab
+            students={sortedStudents}
+            attendance={data.attendance}
           />
         )}
         {activeTab === 'Analytics' && (
