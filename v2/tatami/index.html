@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tatami · Karate V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --card:#FFFFFF;
+    --ink:#2B2722;
+    --muted:#8C8579;
+    --persimmon:#2E6FB5;
+    --persimmon-soft:#E7F0FA;
+    --belt-white:#EDE7DA;
+    --belt-brown:#7A4B2B;
+    --belt-black:#1C1A17;
+    --gold:#C8A24B;
+    --line:#EFE7D7;
+    --radius:22px;
+    --radius-lg:24px;
+    --shadow:0 10px 30px rgba(120,90,50,.10);
+    --shadow-sm:0 4px 14px rgba(120,90,50,.08);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hanken Grotesk",system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(rgba(140,133,121,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(140,133,121,.035) 1px,transparent 1px);
+    background-size:14px 14px;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px 64px}
+
+  /* top bar */
+  .topbar{padding:18px 0 6px}
+  .back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem;
+    padding:8px 14px;border-radius:999px;background:var(--card);
+    box-shadow:var(--shadow-sm);
+  }
+  .back:hover{color:var(--persimmon)}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--persimmon);outline-offset:2px;border-radius:8px}
+
+  /* hero */
+  .hero{
+    margin-top:14px;
+    background:linear-gradient(160deg,#FFFDF8 0%,#EAF1FA 45%,#DCE9F7 100%);
+    border:1px solid var(--line);
+    border-radius:26px;
+    padding:30px 26px 32px;
+    box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;
+    background:radial-gradient(circle,rgba(46,111,181,.18),transparent 70%);
+    border-radius:50%;
+  }
+  .eyebrow{
+    display:inline-block;font-weight:700;font-size:.72rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--persimmon);
+    background:var(--card);padding:6px 12px;border-radius:999px;box-shadow:var(--shadow-sm);
+  }
+  .hero h1{
+    font-family:"Fraunces",serif;font-optical-sizing:auto;
+    font-weight:600;font-size:3.2rem;line-height:1.02;margin:16px 0 8px;
+    letter-spacing:-.01em;
+  }
+  .identity{font-family:"Fraunces",serif;font-weight:500;font-size:1.18rem;color:var(--persimmon);margin:0 0 12px}
+  .hero p{color:#5a544b;font-size:1rem;margin:0;max-width:42ch}
+
+  /* sections */
+  .section-label{
+    font-family:"Fraunces",serif;font-weight:600;font-size:1.45rem;
+    margin:38px 0 6px;
+  }
+  .section-sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+
+  /* phones */
+  .phones{display:flex;flex-direction:column;gap:30px;align-items:center;margin-top:6px}
+  .phone{
+    width:268px;max-width:100%;
+    background:#0f0d0b;
+    border-radius:38px;
+    padding:10px;
+    box-shadow:0 22px 50px rgba(60,40,20,.22);
+  }
+  .phone-screen{
+    background:var(--paper);
+    border-radius:30px;
+    overflow:hidden;
+    background-image:
+      linear-gradient(rgba(140,133,121,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(140,133,121,.04) 1px,transparent 1px);
+    background-size:12px 12px;
+  }
+  .notch{display:flex;justify-content:center;padding:9px 0 4px}
+  .notch span{width:74px;height:6px;border-radius:999px;background:rgba(43,39,34,.18)}
+  .screen-pad{padding:8px 16px 20px}
+
+  .scr-head{font-family:"Fraunces",serif;font-weight:600;font-size:1.6rem;margin:8px 0 2px}
+  .scr-meta{color:var(--muted);font-size:.82rem;font-weight:600;margin:0 0 16px}
+
+  /* in-skin buttons */
+  .btn{
+    font-family:"Hanken Grotesk",sans-serif;font-weight:700;font-size:.95rem;
+    border:none;cursor:pointer;width:100%;
+    padding:14px 16px;border-radius:999px;
+    background:var(--persimmon);color:#fff;
+    box-shadow:0 8px 18px rgba(46,111,181,.30);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn.small{font-size:.86rem;padding:11px 14px}
+  .btn.ghost{background:var(--card);color:var(--ink);box-shadow:var(--shadow-sm)}
+
+  /* cards inside phone */
+  .mini-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:14px;margin-top:12px;box-shadow:var(--shadow-sm);
+  }
+  .mini-card .ttl{font-weight:700;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .mini-card .body{font-size:.9rem}
+  .mini-card .body b{font-weight:700}
+  .streak{color:var(--persimmon);font-weight:700}
+
+  .avatars{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--persimmon-soft);color:#1F4E86;
+    font-weight:700;font-size:.78rem;padding:5px 10px 5px 6px;border-radius:999px;
+  }
+  .ava{width:20px;height:20px;border-radius:50%;background:var(--persimmon);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800}
+  .reg{color:var(--muted);font-size:.82rem;align-self:center;font-weight:600}
+
+  /* paste screen */
+  textarea.paste{
+    width:100%;border:1px solid var(--line);border-radius:16px;
+    background:#FFFDF8;color:var(--ink);font-family:"Hanken Grotesk",sans-serif;
+    font-size:.9rem;line-height:1.6;padding:12px 13px;resize:vertical;min-height:96px;
+    box-shadow:inset 0 1px 3px rgba(120,90,50,.06);
+  }
+  textarea.paste:focus{outline:3px solid var(--persimmon);outline-offset:1px}
+  .parse{margin-top:14px}
+  .parse-row{
+    display:flex;gap:10px;align-items:flex-start;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:12px 13px;margin-top:8px;box-shadow:var(--shadow-sm);
+  }
+  .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;margin-top:5px}
+  .dot.gold{background:var(--gold)}
+  .dot.brown{background:var(--belt-brown)}
+  .dot.black{background:var(--belt-black)}
+  .dot.white{background:var(--belt-white);border:1px solid #d9d0bd}
+  .dot.persimmon{background:var(--persimmon)}
+  .parse-row .lab{font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .parse-row .names{font-size:.9rem;margin-top:2px}
+  .check{
+    width:20px;height:20px;border-radius:6px;background:var(--persimmon);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex:0 0 auto;margin-top:2px;
+  }
+  .addlink{color:var(--persimmon);font-weight:700;font-size:.82rem}
+
+  /* eligibility */
+  .elig-row{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:13px 14px;margin-top:10px;box-shadow:var(--shadow-sm);
+  }
+  .elig-top{display:flex;align-items:center;gap:9px}
+  .elig-name{font-weight:700;font-size:.95rem;flex:1}
+  .pill{font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.02em}
+  .pill.ready{background:#F6EED6;color:#8a6c1e}
+  .pill.close{background:var(--persimmon-soft);color:#1F4E86}
+  .pill.notyet{background:#F1EDE4;color:var(--muted)}
+  .bar{height:8px;border-radius:999px;background:#F1ECE1;margin-top:10px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:999px}
+  .bar > i.gold{background:linear-gradient(90deg,#D9B760,var(--gold))}
+  .bar > i.pers{background:linear-gradient(90deg,#5E9BD8,var(--persimmon))}
+  .bar > i.mut{background:linear-gradient(90deg,#B8AF9d,var(--muted))}
+  .pct{font-size:.78rem;font-weight:700;color:var(--muted);margin-top:6px}
+
+  /* defines list */
+  .defines{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px 22px 8px;box-shadow:var(--shadow);margin-top:8px}
+  .defines li{list-style:none;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
+  .defines ul{margin:0;padding:0}
+  .defines .mk{width:26px;height:26px;border-radius:50%;background:var(--persimmon-soft);color:var(--persimmon);display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto;font-size:.9rem}
+  .defines .txt b{display:block;font-weight:700;margin-bottom:2px}
+  .defines .txt span{color:#5a544b;font-size:.92rem}
+
+  /* choose */
+  .choose-wrap{margin-top:34px;text-align:center}
+  #chooseBtn{
+    font-family:"Hanken Grotesk",sans-serif;font-weight:800;font-size:1.05rem;
+    border:none;cursor:pointer;
+    padding:18px 28px;border-radius:999px;width:100%;
+    background:var(--persimmon);color:#fff;
+    box-shadow:0 12px 26px rgba(46,111,181,.32);
+    transition:transform .15s ease;
+  }
+  #chooseBtn:hover{transform:translateY(-1px)}
+
+  body[data-chosen='1']{box-shadow:inset 0 0 0 5px var(--persimmon)}
+  body[data-chosen='1'] .wrap::before{
+    content:"This is your chosen direction";
+    display:block;text-align:center;font-weight:800;font-size:.82rem;letter-spacing:.06em;
+    text-transform:uppercase;color:#fff;background:var(--persimmon);
+    margin:14px 0 0;padding:9px 14px;border-radius:999px;box-shadow:var(--shadow-sm);
+  }
+  body[data-chosen='1'] #chooseBtn{
+    background:var(--card);color:var(--persimmon);
+    box-shadow:0 0 0 3px var(--persimmon) inset, var(--shadow);
+  }
+
+  footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:40px}
+  footer .heart{color:var(--persimmon)}
+
+  @media (max-width:380px){
+    .hero h1{font-size:2.5rem}
+    .wrap{padding:0 14px 56px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body data-chosen="0">
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="../">‹ All concepts</a>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">Direction 02</span>
+    <h1>Tatami</h1>
+    <p class="identity">Warm, light, and quietly encouraging.</p>
+    <p>This is the friendly direction: sunlit paper, soft rounded cards, and big tap targets a student would actually enjoy opening. It trades cold dashboards for calm clarity, with one confident blue accent and belt colours used only where they mean something.</p>
+  </header>
+
+  <h2 class="section-label">Three screens, one feel</h2>
+  <p class="section-sub">Tap targets are big, corners are round, copy is kind.</p>
+
+  <div class="phones">
+
+    <!-- (a) TODAY -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="notch"><span></span></div>
+        <div class="screen-pad">
+          <h3 class="scr-head">Today</h3>
+          <p class="scr-meta">Sunday · 21 June · Class 47</p>
+
+          <button class="btn">Take attendance, Sun 21/6</button>
+
+          <div class="mini-card">
+            <div class="ttl">Last class · Thu 18/6</div>
+            <div class="body"><b>9 present.</b> Ib on a <span class="streak">6 class streak.</span> Nice momentum.</div>
+          </div>
+
+          <div class="mini-card">
+            <div class="ttl">Expected today</div>
+            <div class="avatars">
+              <span class="chip"><span class="ava">A</span>Angel</span>
+              <span class="chip"><span class="ava">V</span>Varak</span>
+              <span class="chip"><span class="ava">P</span>Paul</span>
+              <span class="reg">+ 14 regulars</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- (b) PASTE ATTENDANCE -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="notch"><span></span></div>
+        <div class="screen-pad">
+          <h3 class="scr-head">Paste who showed up</h3>
+          <p class="scr-meta">Sun 21/6</p>
+
+          <textarea class="paste" rows="4" aria-label="Paste attendance list">IB, angel, varak, paul, julia, ricardo
+Danny Thomas BU</textarea>
+
+          <button class="btn" style="margin-top:12px">Preview</button>
+
+          <div class="parse">
+            <div class="parse-row">
+              <span class="dot gold"></span>
+              <div>
+                <div class="lab">Present (6)</div>
+                <div class="names">Ib, Angel, Varak, Paul, Julia, Ricardo</div>
+              </div>
+            </div>
+
+            <div class="parse-row">
+              <span class="check">✓</span>
+              <div>
+                <div class="lab">Not on roster (1)</div>
+                <div class="names">Danny Thomas BU &nbsp;<span class="addlink">add + mark present</span></div>
+              </div>
+            </div>
+
+            <div class="parse-row">
+              <span class="dot white"></span>
+              <div>
+                <div class="lab">Will be marked absent (27)</div>
+                <div class="names" style="color:var(--muted)">Tap any name to keep them in.</div>
+              </div>
+            </div>
+
+            <button class="btn" style="margin-top:14px">Save attendance for Sun 21/6 (7 present)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- (c) ELIGIBILITY -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="notch"><span></span></div>
+        <div class="screen-pad">
+          <h3 class="scr-head">Eligibility</h3>
+          <p class="scr-meta">Black belt camp · New Orleans</p>
+
+          <div class="elig-row">
+            <div class="elig-top">
+              <span class="dot gold"></span>
+              <span class="elig-name">Vazrik</span>
+              <span class="pill ready">Ready</span>
+            </div>
+            <div class="bar"><i class="gold" style="width:94%"></i></div>
+            <div class="pct">94% attendance</div>
+          </div>
+
+          <div class="elig-row">
+            <div class="elig-top">
+              <span class="dot gold"></span>
+              <span class="elig-name">Cassiano</span>
+              <span class="pill ready">Ready</span>
+            </div>
+            <div class="bar"><i class="gold" style="width:90%"></i></div>
+            <div class="pct">90% attendance</div>
+          </div>
+
+          <div class="elig-row">
+            <div class="elig-top">
+              <span class="dot brown"></span>
+              <span class="elig-name">Ib</span>
+              <span class="pill close">Close</span>
+            </div>
+            <div class="bar"><i class="pers" style="width:86%"></i></div>
+            <div class="pct">86% attendance</div>
+          </div>
+
+          <div class="elig-row">
+            <div class="elig-top">
+              <span class="dot white"></span>
+              <span class="elig-name">Paul</span>
+              <span class="pill notyet">Not yet</span>
+            </div>
+            <div class="bar"><i class="mut" style="width:62%"></i></div>
+            <div class="pct">62% attendance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-label">What defines this direction</h2>
+  <div class="defines">
+    <ul>
+      <li>
+        <span class="mk">1</span>
+        <span class="txt"><b>Warm and light by default</b><span>Sunlit paper, white cards, and a single blue accent. Nothing cold or harsh.</span></span>
+      </li>
+      <li>
+        <span class="mk">2</span>
+        <span class="txt"><b>Big, friendly tap targets</b><span>Rounded cards, pill buttons, and avatar chips sized for a thumb on a phone.</span></span>
+      </li>
+      <li>
+        <span class="mk">3</span>
+        <span class="txt"><b>Belt colours that mean something</b><span>White, brown, black, and gold dots used only as functional status, never decoration.</span></span>
+      </li>
+      <li>
+        <span class="mk">4</span>
+        <span class="txt"><b>Encouraging by tone</b><span>Streaks, momentum, and kind microcopy make a student want to open it.</span></span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="choose-wrap">
+    <button id="chooseBtn">Choose this direction</button>
+  </div>
+
+  <footer>
+    Tatami, one of three concepts for the JKA Black Belt attendance app. Built with <span class="heart">care.</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY='karate-v2-concept', ID='tatami';
+  var btn=document.getElementById('chooseBtn');
+  function isOn(){return localStorage.getItem(KEY)===ID;}
+  function paint(){document.body.setAttribute('data-chosen', isOn()?'1':'0');
+    if(btn) btn.textContent=isOn()?'✓ This is your pick':'Choose this direction';}
+  if(btn) btn.addEventListener('click',function(){ localStorage.setItem(KEY, isOn()?'':ID); paint(); });
+  paint();
+})();
+</script>
+</body>
+</html>
