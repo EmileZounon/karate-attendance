@@ -88,6 +88,13 @@
   .section-sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
 
   .vision{display:block;width:100%;border-radius:24px;border:1px solid var(--line);box-shadow:var(--shadow);margin:18px 0 6px}
+  .chartbars{display:flex;align-items:flex-end;gap:7px;height:92px;margin:8px 0 2px}
+  .chartbars i{flex:1;border-radius:6px 6px 0 0;background:var(--persimmon)}
+  .chartbars i.g{background:var(--gold)}
+  .awd{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.9rem;font-weight:600}
+  .awd:last-child{border-bottom:0}
+  .awd .m{font-size:1.1rem}
+  .awd .pct{margin-left:auto;color:var(--muted);font-size:.78rem}
   /* phones */
   .phones{display:flex;flex-direction:column;gap:30px;align-items:center;margin-top:6px}
   .phone{
@@ -249,7 +256,7 @@
     <p>The approachable direction. Sunlit paper, soft rounded cards, and generous tap targets make it easy to use at a glance. It favours calm clarity over a dense dashboard, with a single confident blue accent and belt colours reserved for genuine status.</p>
   </header>
 
-  <img class="vision" src="hero.jpg" alt="A phone on a sunlit tatami mat beside a folded white gi" />
+  <img class="vision" src="photo.jpg" alt="Vazrik training in a karate stance in a bright dojo" />
 
   <h2 class="section-label">Three screens, one feel</h2>
   <p class="section-sub">Generous tap targets, rounded corners, and plain, friendly language throughout.</p>
@@ -379,6 +386,28 @@ Danny Thomas BU</textarea>
       </div>
     </div>
 
+    <!-- (d) CHARTS AND AWARDS -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="notch"><span></span></div>
+        <div class="screen-pad">
+          <h3 class="scr-head">Charts and awards</h3>
+          <p class="scr-meta">Every graph you have today, kept</p>
+          <div class="mini-card">
+            <div class="ttl">Total attendance by student</div>
+            <div class="chartbars"><i style="height:92%"></i><i style="height:78%"></i><i style="height:70%"></i><i class="g" style="height:60%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:30%"></i></div>
+          </div>
+          <div class="mini-card">
+            <div class="ttl">Monthly award · June</div>
+            <div class="awd"><span class="m">🥇</span><span>Ib</span><span class="pct">22 classes</span></div>
+            <div class="awd"><span class="m">🥈</span><span>Angel</span><span class="pct">20 classes</span></div>
+            <div class="awd"><span class="m">🥉</span><span>Paul</span><span class="pct">19 classes</span></div>
+          </div>
+          <button class="btn ghost" style="margin-top:12px">Download report (PDF)</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <h2 class="section-label">What defines this direction</h2>
@@ -399,6 +428,10 @@ Danny Thomas BU</textarea>
       <li>
         <span class="mk">4</span>
         <span class="txt"><b>An encouraging tone</b><span>Streaks and steady progress are surfaced gently, to keep students returning to the mat.</span></span>
+      </li>
+      <li>
+        <span class="mk">5</span>
+        <span class="txt"><b>Nothing from today is lost</b><span>The Charts and Analytics graphs, the monthly awards, and the one tap PDF download all carry over.</span></span>
       </li>
     </ul>
   </div>

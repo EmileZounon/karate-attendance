@@ -80,6 +80,14 @@
   .status.no{background:transparent;color:var(--gi-faint);border:1px solid var(--line-2)}
   .bar{height:5px;border-radius:3px;background:rgba(239,231,216,.12);margin-top:6px;overflow:hidden}
   .bar i{display:block;height:100%;border-radius:3px;background:var(--gold)}
+  .chartbars{display:flex;align-items:flex-end;gap:7px;height:96px;margin:6px 0 2px}
+  .chartbars i{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--red),var(--red-deep))}
+  .chartbars i.g{background:linear-gradient(180deg,var(--gold),#8a6d28)}
+  .awd{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.82rem}
+  .awd:last-child{border-bottom:0}
+  .awd .m{font-size:1.05rem;flex:0 0 auto}
+  .awd .pct{margin-left:auto;color:var(--gi-dim);font-size:.72rem}
+  .ghostbtn{background:transparent;border:1px solid var(--line-2);color:var(--gi);border-radius:12px;padding:11px;text-align:center;font-weight:700;font-size:.8rem}
 
   .defines{margin:30px 0 0}
   .defines h3{font-family:var(--serif);font-weight:400;font-size:1.25rem;margin-bottom:.7rem}
@@ -110,7 +118,7 @@
     <p class="lede">A dark, restrained interface built on sumi ink and gi canvas, with a single hinomaru red. It is formal and disciplined, in keeping with how the JKA presents itself, and it reserves gold for what a student has earned.</p>
   </header>
 
-  <img class="vision" src="hero.jpg" alt="A phone resting on a bench in a traditional dojo at dusk, beside a black belt and a sumi brush" />
+  <img class="vision" src="photo.jpg" alt="Cassiano in his gi, tying his black belt in the dojo" />
 
   <div class="filmstrip">
     <div class="filmcell">
@@ -159,6 +167,26 @@
       </div></div>
       <div class="filmcap"><b>Eligibility</b></div>
     </div>
+
+    <div class="filmcell">
+      <div class="phone"><div class="notch"></div><div class="screen">
+        <div class="sb"><span>9:41</span><span>5G&nbsp;&nbsp;▮▮▮&nbsp;&nbsp;87</span></div>
+        <div class="scr-body">
+          <div class="scr-title">Charts and awards</div>
+          <div class="scr-sub">Every graph you have today, kept</div>
+          <div class="mk-card"><div class="sub" style="margin-bottom:8px">Total attendance by student</div>
+            <div class="chartbars"><i style="height:92%"></i><i style="height:78%"></i><i style="height:70%"></i><i class="g" style="height:60%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:30%"></i></div>
+          </div>
+          <div class="mk-card"><div class="sub" style="margin-bottom:4px">Monthly award · June</div>
+            <div class="awd"><span class="m">🥇</span><span>Ib</span><span class="pct">22 classes</span></div>
+            <div class="awd"><span class="m">🥈</span><span>Angel</span><span class="pct">20 classes</span></div>
+            <div class="awd"><span class="m">🥉</span><span>Paul</span><span class="pct">19 classes</span></div>
+          </div>
+        </div>
+        <div style="padding:8px 14px 12px"><div class="ghostbtn">⤓ Download report (PDF)</div></div>
+      </div></div>
+      <div class="filmcap"><b>Charts and awards</b> · kept in every direction</div>
+    </div>
   </div>
 
   <div class="defines">
@@ -169,6 +197,7 @@
       <li><b>Sumi ink with a single red accent.</b> The palette stays dark and restrained, and gold appears only to mark what has been earned.</li>
       <li><b>A seal to confirm.</b> Recording attendance feels deliberate, much like stamping a form.</li>
       <li><b>Paste the whole list.</b> You can still record a full class in seconds, on every screen.</li>
+      <li><b>Nothing from today is lost.</b> The Charts and Analytics graphs, the monthly awards, and the one tap PDF download all carry over.</li>
     </ul>
   </div>
 
