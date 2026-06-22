@@ -99,6 +99,7 @@ export default function App() {
             students={sortedStudents}
             attendance={data.attendance}
             updateAttendance={updateAttendance}
+            updateBoth={updateBoth}
           />
         )}
         {activeTab === 'Analytics' && (

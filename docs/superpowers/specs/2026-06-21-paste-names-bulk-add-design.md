@@ -102,6 +102,61 @@ with a dev build.
 
 ## Out of scope (YAGNI)
 
-- Importing attendance/dates from the paste (names only).
 - Phone-number parsing, OCR from images.
 - Adding a test framework to the repo.
+
+---
+
+# Part 2: Take attendance by pasting (Attendance tab)
+
+## Problem
+
+The bigger workflow: record a whole class at once by pasting the list of who
+showed up (e.g. June 21st: `IB, angel, varak, paul, julia, ricardo`), instead of
+clicking each student's cell in the grid.
+
+## Key behaviors (decided with user)
+
+- Mark pasted (matched) students **present (1)** for the chosen date.
+- Mark **every other roster student absent (0)** for that date (explicit 0s, not
+  blanks). Stats already treat a missing `1` as a miss, so this is presentational
+  + complete; see `statistics.js:4-9, 18-20`.
+- Unmatched pasted names → checkboxes; ticking **adds them to the roster AND marks
+  them present** for the date (reuses Part 1's add path).
+- Overwrite guard: if the chosen date already has data, the preview warns that
+  saving replaces the whole day (prevents a partial paste from wiping earlier marks).
+
+## Components
+
+### Pure helper — `src/utils/attendanceUpdate.js`
+
+`buildAttendanceUpdate(date, attendance, presentNames, allStudents) -> newAttendance`
+- Returns a new attendance object; only `[date]` is rebuilt.
+- For each student in `allStudents`: `1` if in `presentNames` (exact match — caller
+  passes roster spellings), else `0`.
+- All other dates untouched (shallow-cloned).
+
+Matching pasted text → names reuses `parseNameList` from Part 1:
+- `duplicates` = present (roster spelling)
+- `newNames` = not on roster (rescuable via checkbox → add + present)
+- `skipped` = junk lines (rescuable)
+
+### UI component — `src/components/PasteAttendance.jsx`
+
+Collapsible "Take attendance (paste who showed up)" panel at the top of the
+Attendance tab. Date `<select>` (all class dates, default = today if a class day,
+else most recent past class), textarea, Preview, then Save. Preview shows: date +
+overwrite warning, Present group, Not-on-roster checkboxes, "Will be marked absent
+(N)" collapsible, Skipped group. Save commits via `updateBoth(newStudents,
+newAttendance)` (one atomic write + auto-backup).
+
+## Wiring
+
+`App.jsx` passes `updateBoth` to `AttendanceTab`, which renders `PasteAttendance`
+above the grid.
+
+## Testing
+
+`buildAttendanceUpdate` unit-tested with Node: present→1, others→0, other dates
+untouched, newly-added student included. Browser-verified on a throwaway date only
+(never saved to a real class date during testing).

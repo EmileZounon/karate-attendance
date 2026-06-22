@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { generateDates, formatDate, getMonthKey, getMonthLabel } from '../utils/dateUtils';
 import { countPresent } from '../utils/statistics';
+import PasteAttendance from './PasteAttendance';
 
-export default function AttendanceTab({ students, attendance, updateAttendance }) {
+export default function AttendanceTab({ students, attendance, updateAttendance, updateBoth }) {
   const dates = useMemo(() => generateDates(), []);
   const [activeMonth, setActiveMonth] = useState('');
 
@@ -40,6 +41,12 @@ export default function AttendanceTab({ students, attendance, updateAttendance }
 
   return (
     <div>
+      <PasteAttendance
+        students={students}
+        attendance={attendance}
+        updateBoth={updateBoth}
+      />
+
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
         <p className="text-sm text-gray-600">
           Click cells to toggle: 0 (Absent) &harr; 1 (Present)
