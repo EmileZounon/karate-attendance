@@ -117,10 +117,7 @@ export default function App() {
           />
         )}
         {activeTab === 'Dan Exam' && (
-          <GradingTab
-            students={sortedStudents}
-            attendance={data.attendance}
-          />
+          <GradingTab />
         )}
         {activeTab === 'Awards' && (
           <AwardsTab
