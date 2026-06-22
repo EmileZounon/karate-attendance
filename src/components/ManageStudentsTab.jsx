@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import * as XLSX from 'xlsx';
 import ImportWordDoc from './ImportWordDoc';
+import PasteNamesBulkAdd from './PasteNamesBulkAdd';
 import { formatDate, generateDates, getMonthKey, getMonthLabel } from '../utils/dateUtils';
 import { calculateStudentStats, calculateMonthlySummary, calculateStudentMonthly, getClassesHeld } from '../utils/statistics';
 
@@ -95,6 +96,11 @@ export default function ManageStudentsTab({
 
   const handleImportStudents = (mergedStudents) => {
     updateStudents(mergedStudents);
+  };
+
+  const handleBulkAdd = (newNames) => {
+    if (!newNames.length) return;
+    updateStudents([...students, ...newNames]);
   };
 
   const exportExcel = () => {
@@ -209,6 +215,9 @@ export default function ManageStudentsTab({
           </button>
         </div>
       </section>
+
+      {/* Paste Names (bulk add) */}
+      <PasteNamesBulkAdd students={students} onAdd={handleBulkAdd} />
 
       {/* Student List */}
       <section className="p-4 border rounded-lg bg-white shadow-sm">
