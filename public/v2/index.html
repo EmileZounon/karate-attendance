@@ -29,11 +29,14 @@
   .cards{margin-top:34px;display:flex;flex-direction:column;gap:18px}
   .card{border-radius:20px;overflow:hidden;border:1px solid var(--line);position:relative;transition:transform .15s,border-color .2s,box-shadow .2s;display:block}
   .card:active{transform:scale(.99)}
-  .card .swatch{height:118px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
-  .card .nm{font-size:1.9rem;line-height:1}
-  .card .jp{position:absolute;top:14px;right:16px;font-size:1.4rem;opacity:.5}
+  .card .swatch{height:170px;padding:14px 18px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+  .cardbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%;z-index:0}
+  .card .swatch::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.62));z-index:1}
+  .card .swatch > *{position:relative;z-index:2}
+  .card .nm{font-size:1.9rem;line-height:1;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+  .card .jp{position:absolute;top:13px;right:16px;font-size:1.4rem;color:#fff;opacity:.85;z-index:2;text-shadow:0 2px 10px rgba(0,0,0,.6)}
   .chips{display:flex;gap:7px}
-  .chip{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}
+  .chip{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.6)}
   .card .meta{background:var(--panel);padding:14px 18px 16px}
   .card .tag{font-size:.92rem;color:var(--fg);font-weight:500}
   .card .desc{font-size:.82rem;color:var(--dim);margin-top:.25rem}
@@ -74,34 +77,34 @@
   <header>
     <div class="kick">JKA · Black Belt Program 2026</div>
     <h1>Three <em>directions</em></h1>
-    <p class="lede">Same app, three personalities. Open each on your phone, then pick the look and feel you want me to build for real.</p>
-    <div class="pasteline"><span class="ic">⌨</span><div>Every direction keeps <b>paste the whole list</b> to take attendance, exactly like you do now.</div></div>
+    <p class="lede">Three takes on the same app. Each one handles the daily roll, attendance, and eligibility in its own voice. Open them on your phone, then choose the direction you would like me to build.</p>
+    <div class="pasteline"><span class="ic">⌨</span><div>Whichever you choose, you will still <b>take attendance by pasting the whole list</b>, exactly as you do today.</div></div>
   </header>
 
   <div class="cards">
     <a class="card" href="dojo/" data-id="dojo">
       <span class="badge">✓ Your pick</span>
-      <div class="swatch sw-dojo"><span class="jp">道場</span><div class="nm">Dojo</div><div class="chips"><span class="chip" style="background:#15110F"></span><span class="chip" style="background:#D23B2C"></span><span class="chip" style="background:#3E5C82"></span><span class="chip" style="background:#C8A24B"></span></div></div>
-      <div class="meta"><div class="tag">Traditional &amp; formal</div><div class="desc">Sumi ink, serif headlines, kanji, hanko seals. Looks like the JKA.</div>
+      <div class="swatch sw-dojo"><img class="cardbg" src="dojo/hero.jpg" alt="A phone in a traditional dojo at dusk" loading="lazy"><span class="jp">道場</span><div class="nm">Dojo</div><div class="chips"><span class="chip" style="background:#15110F"></span><span class="chip" style="background:#D23B2C"></span><span class="chip" style="background:#3E5C82"></span><span class="chip" style="background:#C8A24B"></span></div></div>
+      <div class="meta"><div class="tag">Traditional and formal</div><div class="desc">A dark, restrained interface built on sumi ink, serif headlines, and Japanese seals. It carries the weight of the JKA.</div>
         <div class="foot"><span class="open">Open <span class="arr">›</span></span><button class="pickbtn" data-pick="dojo" type="button">Choose</button></div></div>
     </a>
 
     <a class="card" href="tatami/" data-id="tatami">
       <span class="badge">✓ Your pick</span>
-      <div class="swatch sw-tatami"><span class="jp">畳</span><div class="nm">Tatami</div><div class="chips"><span class="chip" style="background:#FBF6EC"></span><span class="chip" style="background:#2E6FB5"></span><span class="chip" style="background:#7A4B2B"></span><span class="chip" style="background:#C8A24B"></span></div></div>
-      <div class="meta"><div class="tag">Warm, light &amp; friendly</div><div class="desc">Soft rounded cards, belt colours, daylight bright. Easy and inviting.</div>
+      <div class="swatch sw-tatami"><img class="cardbg" src="tatami/hero.jpg" alt="A phone on a sunlit tatami mat beside a white gi" loading="lazy"><span class="jp">畳</span><div class="nm">Tatami</div><div class="chips"><span class="chip" style="background:#FBF6EC"></span><span class="chip" style="background:#2E6FB5"></span><span class="chip" style="background:#7A4B2B"></span><span class="chip" style="background:#C8A24B"></span></div></div>
+      <div class="meta"><div class="tag">Warm, light, and approachable</div><div class="desc">Soft rounded cards on a bright background, with a clear blue accent and belt colours that mark real status. Comfortable to read in daylight.</div>
         <div class="foot"><span class="open">Open <span class="arr">›</span></span><button class="pickbtn" data-pick="tatami" type="button">Choose</button></div></div>
     </a>
 
     <a class="card" href="kumite/" data-id="kumite">
       <span class="badge">✓ Your pick</span>
-      <div class="swatch sw-kumite"><span class="jp">組手</span><div class="nm">Kumite</div><div class="chips"><span class="chip" style="background:#0A0C0F"></span><span class="chip" style="background:#FFB81C"></span><span class="chip" style="background:#3C5A74"></span><span class="chip" style="background:#E8EDF2"></span></div></div>
-      <div class="meta"><div class="tag">Bold &amp; athletic</div><div class="desc">Dark dashboard, condensed type, big stat numbers. A training tracker.</div>
+      <div class="swatch sw-kumite"><img class="cardbg" src="kumite/hero.jpg" alt="A fighter holding a phone with a performance dashboard" loading="lazy"><span class="jp">組手</span><div class="nm">Kumite</div><div class="chips"><span class="chip" style="background:#0A0C0F"></span><span class="chip" style="background:#FFB81C"></span><span class="chip" style="background:#3C5A74"></span><span class="chip" style="background:#E8EDF2"></span></div></div>
+      <div class="meta"><div class="tag">Bold and athletic</div><div class="desc">A dark dashboard with condensed type and large figures, closer to a training tracker than a register.</div>
         <div class="foot"><span class="open">Open <span class="arr">›</span></span><button class="pickbtn" data-pick="kumite" type="button">Choose</button></div></div>
     </a>
   </div>
 
-  <p class="note">Tap <b style="color:var(--fg)">Open</b> to walk through a direction. Tap <b style="color:var(--fg)">Choose</b> here or inside. Your pick saves on this phone, then hit Copy and send it to me.</p>
+  <p class="note">Open a direction to walk through it, then choose it here or on its own page. Your choice is saved on this phone. Once you have decided, tap <b style="color:var(--fg)">Copy my pick</b> and send it over.</p>
 </div>
 
 <div class="footbar"><div class="inner">
