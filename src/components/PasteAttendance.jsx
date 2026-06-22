@@ -96,36 +96,36 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
   const absent = absentList();
 
   return (
-    <section className="mb-4 p-4 border rounded-lg bg-white shadow-sm no-print">
+    <section className="dojo-card mb-4 p-4 no-print">
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between text-left"
       >
-        <h2 className="text-lg font-bold">Take attendance (paste who showed up)</h2>
-        <span className="text-gray-400 text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
+        <h2 className="text-lg font-bold font-serif text-gi">Take attendance (paste who showed up)</h2>
+        <span className="text-gifaint text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
       </button>
 
       {open && (
         <div className="mt-3 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Class date:</label>
+            <label className="text-sm font-medium text-gidim">Class date:</label>
             <select
               value={date}
               onChange={(e) => { setDate(e.target.value); setPreview(null); setDone(null); }}
-              className="flex-1 min-w-[8rem] sm:flex-none px-3 py-2.5 border rounded-lg text-base sm:text-sm bg-white"
+              className="flex-1 min-w-[8rem] sm:flex-none px-3 py-2.5 border border-line2 rounded-lg text-base sm:text-sm bg-sumi3 text-gi"
             >
               {dates.map((d) => (
                 <option key={d} value={d}>{formatDate(d)}</option>
               ))}
             </select>
             {dateHasData && (
-              <span className="text-xs text-amber-700 bg-amber-100 rounded px-2 py-1">
+              <span className="text-xs text-gold bg-sumi3 border border-line2 rounded px-2 py-1">
                 ⚠ {formatDate(date)} already has {existingPresent} present recorded — saving replaces the whole day
               </span>
             )}
           </div>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gidim">
             Paste the list of who attended (commas or one per line, e.g. from WhatsApp).
             They get marked present; everyone else on the roster is marked absent for this date.
           </p>
@@ -134,20 +134,20 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
             onChange={(e) => setText(e.target.value)}
             rows={5}
             placeholder={'IB, angel, varak, paul, julia, ricardo\n\nor one name per line, pasted from WhatsApp'}
-            className="w-full px-3 py-2 border rounded text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-base focus:outline-none focus:border-hinomaru"
           />
           <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={runPreview}
               disabled={!text.trim() || !date}
-              className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="dojo-cta w-full sm:w-auto px-4 py-2.5 rounded transition-colors disabled:opacity-50"
             >
               Preview
             </button>
             {(preview || text) && (
               <button
                 onClick={reset}
-                className="w-full sm:w-auto px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                className="dojo-ghost w-full sm:w-auto px-4 py-2.5 rounded transition-colors"
               >
                 Clear
               </button>
@@ -155,40 +155,40 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
           </div>
 
           {done && (
-            <div className="p-3 rounded text-sm bg-green-100 text-green-700">{done}</div>
+            <div className="p-3 rounded text-sm bg-sumi3 border border-line2 text-indigosoft">{done}</div>
           )}
 
           {preview && (
-            <div className="space-y-4 border-t pt-3">
+            <div className="space-y-4 border-t border-line2 pt-3">
               {/* Present */}
               <div>
-                <h3 className="font-semibold text-sm text-gray-800 mb-1">
+                <h3 className="font-semibold text-sm font-serif text-gi mb-1">
                   Present ({present.length})
                 </h3>
                 {present.length > 0 ? (
-                  <p className="text-sm text-green-700">{present.join(', ')}</p>
+                  <p className="text-sm text-[#E8786C]">{present.join(', ')}</p>
                 ) : (
-                  <p className="text-sm text-gray-500">No pasted names matched the roster.</p>
+                  <p className="text-sm text-gifaint">No pasted names matched the roster.</p>
                 )}
               </div>
 
               {/* Not on roster */}
               {preview.newNames.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-sm text-gray-800 mb-1">
+                  <h3 className="font-semibold text-sm font-serif text-gi mb-1">
                     Not on roster ({preview.newNames.length})
                   </h3>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gifaint mb-2">
                     Tick to add them to the roster and mark present for this date.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {preview.newNames.map((n) => (
-                      <label key={n.name} className="flex items-center gap-2 text-sm py-1.5">
+                      <label key={n.name} className="flex items-center gap-2 text-sm text-gi py-1.5">
                         <input
                           type="checkbox"
                           checked={!!checked[n.name]}
                           onChange={() => toggle(n.name)}
-                          className="h-5 w-5 rounded shrink-0"
+                          className="h-5 w-5 rounded shrink-0 accent-hinomaru"
                         />
                         <span>{n.name}</span>
                       </label>
@@ -200,20 +200,20 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               {/* Skipped junk, rescuable */}
               {preview.skipped.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-sm text-gray-800 mb-1">
+                  <h3 className="font-semibold text-sm font-serif text-gi mb-1">
                     Doesn&apos;t look like a name ({preview.skipped.length})
                   </h3>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gifaint mb-2">
                     Skipped (dates, class lines, etc). Tick any that are actually a student.
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     {preview.skipped.map((s) => (
-                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gray-500 py-1.5">
+                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gifaint py-1.5">
                         <input
                           type="checkbox"
                           checked={!!checked[s.raw]}
                           onChange={() => toggle(s.raw)}
-                          className="h-5 w-5 rounded shrink-0"
+                          className="h-5 w-5 rounded shrink-0 accent-hinomaru"
                         />
                         <span>{s.raw}</span>
                       </label>
@@ -226,19 +226,19 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               <div>
                 <button
                   onClick={() => setShowAbsent((v) => !v)}
-                  className="font-semibold text-sm text-gray-800"
+                  className="font-semibold text-sm font-serif text-gi"
                 >
                   Will be marked absent ({absent.length}) {showAbsent ? '▲' : '▸'}
                 </button>
                 {showAbsent && (
-                  <p className="text-sm text-gray-400 mt-1">{absent.join(', ') || 'None'}</p>
+                  <p className="text-sm text-gidim mt-1">{absent.join(', ') || 'None'}</p>
                 )}
               </div>
 
               {presentCount > 0 && (
                 <button
                   onClick={save}
-                  className="w-full sm:w-auto px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-base font-medium"
+                  className="dojo-cta w-full sm:w-auto px-4 py-3 rounded transition-colors text-base font-medium"
                 >
                   Save attendance for {formatDate(date)} ({presentCount} present)
                 </button>

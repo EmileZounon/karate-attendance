@@ -59,8 +59,8 @@ export default function App() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading attendance data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-hinomaru mx-auto mb-4"></div>
+          <p className="text-gidim">Loading attendance data...</p>
         </div>
       </div>
     );
@@ -69,13 +69,17 @@ export default function App() {
   return (
     <PasswordGate>
     <div className="max-w-[1400px] mx-auto p-4">
-      <header className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-blue-800">
+      <header className="text-center mb-6 relative">
+        <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim mb-1">
+          道場 · JKA
+        </div>
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal text-gi">
           Karate Black Belt Program 2026
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <span className="dojo-brush mx-auto mt-3" />
+        <p className="text-sm text-gifaint mt-3">
           Last saved: {savedTime}
-          {error && <span className="text-red-500 ml-2">(offline mode)</span>}
+          {error && <span className="text-hinomaru ml-2">(offline mode)</span>}
         </p>
       </header>
 

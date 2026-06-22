@@ -59,18 +59,18 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
   const selectedCount = selectedNames().length;
 
   return (
-    <section className="p-4 border rounded-lg bg-white shadow-sm">
+    <section className="dojo-card p-4">
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between text-left"
       >
-        <h2 className="text-lg font-bold">Paste Names (bulk add)</h2>
-        <span className="text-gray-400 text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
+        <h2 className="text-lg font-serif text-gi">Paste Names (bulk add)</h2>
+        <span className="text-gifaint text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
       </button>
 
       {open && (
         <div className="mt-3 space-y-3">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gidim">
             Paste a list of names (one per line, or separated by commas). The app
             adds only the new ones and skips anyone already on the roster.
           </p>
@@ -79,20 +79,20 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
             onChange={(e) => setText(e.target.value)}
             rows={5}
             placeholder={'IB, angel, varak, paul, julia, ricardo\n\nor one name per line, pasted from WhatsApp'}
-            className="w-full px-3 py-2 border rounded text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-base focus:outline-none focus:border-hinomaru"
           />
           <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={runPreview}
               disabled={!text.trim()}
-              className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="dojo-cta w-full sm:w-auto px-4 py-2.5 disabled:opacity-50"
             >
               Preview
             </button>
             {(preview || text) && (
               <button
                 onClick={reset}
-                className="w-full sm:w-auto px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                className="dojo-ghost w-full sm:w-auto px-4 py-2.5"
               >
                 Clear
               </button>
@@ -100,20 +100,20 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
           </div>
 
           {done && (
-            <div className="p-3 rounded text-sm bg-green-100 text-green-700">{done}</div>
+            <div className="p-3 rounded-lg text-sm bg-sumi3 border border-line text-indigosoft">{done}</div>
           )}
 
           {preview && (
-            <div className="space-y-4 border-t pt-3">
+            <div className="space-y-4 border-t border-line2 pt-3">
               {/* New names */}
               {preview.newNames.length > 0 ? (
                 <div>
-                  <h3 className="font-semibold text-sm text-gray-800 mb-2">
+                  <h3 className="font-serif text-sm text-gi mb-2">
                     New names ({preview.newNames.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {preview.newNames.map((n) => (
-                      <label key={n.name} className="flex items-center gap-2 text-sm py-1.5">
+                      <label key={n.name} className="flex items-center gap-2 text-sm text-gi py-1.5 px-2 border border-line rounded-lg">
                         <input
                           type="checkbox"
                           checked={!!checked[n.name]}
@@ -126,21 +126,21 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No new names to add.</p>
+                <p className="text-sm text-gifaint">No new names to add.</p>
               )}
 
               {/* Rescuable skipped lines */}
               {preview.skipped.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-sm text-gray-800 mb-1">
+                  <h3 className="font-serif text-sm text-gi mb-1">
                     Doesn&apos;t look like a name ({preview.skipped.length})
                   </h3>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gifaint mb-2">
                     Skipped (dates, class lines, etc). Tick any that are actually a student.
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     {preview.skipped.map((s) => (
-                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gray-500 py-1.5">
+                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gifaint py-1.5 px-2 border border-line rounded-lg">
                         <input
                           type="checkbox"
                           checked={!!checked[s.raw]}
@@ -157,17 +157,17 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               {/* Already on roster */}
               {preview.duplicates.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-sm text-gray-800 mb-1">
+                  <h3 className="font-serif text-sm text-gi mb-1">
                     Already in app ({preview.duplicates.length})
                   </h3>
-                  <p className="text-sm text-gray-400">{preview.duplicates.join(', ')}</p>
+                  <p className="text-sm text-gifaint">{preview.duplicates.join(', ')}</p>
                 </div>
               )}
 
               {selectedCount > 0 && (
                 <button
                   onClick={commit}
-                  className="w-full sm:w-auto px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-base font-medium"
+                  className="dojo-cta w-full sm:w-auto px-4 py-3 text-base font-medium"
                 >
                   Add {selectedCount} student{selectedCount > 1 ? 's' : ''}
                 </button>
