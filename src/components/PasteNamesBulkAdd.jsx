@@ -79,20 +79,20 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
             onChange={(e) => setText(e.target.value)}
             rows={5}
             placeholder={'IB, angel, varak, paul, julia, ricardo\n\nor one name per line, pasted from WhatsApp'}
-            className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border rounded text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={runPreview}
               disabled={!text.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               Preview
             </button>
             {(preview || text) && (
               <button
                 onClick={reset}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                className="w-full sm:w-auto px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
               >
                 Clear
               </button>
@@ -113,12 +113,12 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {preview.newNames.map((n) => (
-                      <label key={n.name} className="flex items-center gap-2 text-sm">
+                      <label key={n.name} className="flex items-center gap-2 text-sm py-1.5">
                         <input
                           type="checkbox"
                           checked={!!checked[n.name]}
                           onChange={() => toggle(n.name)}
-                          className="rounded"
+                          className="h-5 w-5 rounded shrink-0"
                         />
                         <span>{n.name}</span>
                       </label>
@@ -140,12 +140,12 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     {preview.skipped.map((s) => (
-                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gray-500">
+                      <label key={s.raw} className="flex items-center gap-2 text-sm text-gray-500 py-1.5">
                         <input
                           type="checkbox"
                           checked={!!checked[s.raw]}
                           onChange={() => toggle(s.raw)}
-                          className="rounded"
+                          className="h-5 w-5 rounded shrink-0"
                         />
                         <span>{s.raw}</span>
                       </label>
@@ -167,7 +167,7 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               {selectedCount > 0 && (
                 <button
                   onClick={commit}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                  className="w-full sm:w-auto px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-base font-medium"
                 >
                   Add {selectedCount} student{selectedCount > 1 ? 's' : ''}
                 </button>
