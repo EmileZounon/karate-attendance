@@ -175,6 +175,10 @@
     background:transparent;color:var(--amber);
     border:1px solid rgba(255,184,28,.5);
   }
+  .chartlabel{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:10px;color:var(--muted);margin:2px 0 8px;}
+  .chartbars{display:flex;align-items:flex-end;gap:6px;height:94px;}
+  .chartbars i{flex:1;border-radius:2px 2px 0 0;background:rgba(255,184,28,.32);}
+  .chartbars i.hi{background:var(--amber);}
 
   .stat{
     font-family:"Oswald",sans-serif;font-weight:700;
@@ -374,7 +378,7 @@
       <div class="speedbar" aria-hidden="true"></div>
     </section>
 
-    <img class="vision" src="hero.jpg" alt="A martial artist holding a phone showing a performance dashboard in a dark gym" />
+    <img class="vision" src="photo.jpg" alt="Karateka training stances together in a bright dojo" />
 
     <div class="sectionlabel">Screens</div>
 
@@ -516,6 +520,27 @@ Danny Thomas BU</textarea>
         <div class="scaption">C · Eligibility</div>
       </div>
 
+      <!-- (d) CHARTS AND AWARDS -->
+      <div>
+        <div class="phone">
+          <div class="notch" aria-hidden="true"><span></span></div>
+          <div class="screen">
+            <div class="sh"><h2>Charts</h2></div>
+            <div class="meta">Every graph you have today, kept</div>
+            <div class="chartlabel">Total attendance by student</div>
+            <div class="chartbars"><i class="hi" style="height:92%"></i><i style="height:78%"></i><i style="height:70%"></i><i style="height:60%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:30%"></i></div>
+            <div class="chartlabel" style="margin-top:20px;">Monthly award · June</div>
+            <div class="lb">
+              <div class="lbrow"><span class="rank">1</span><div class="lbmid"><span class="lbname">Ib</span></div><div class="pct top">22</div></div>
+              <div class="lbrow"><span class="rank">2</span><div class="lbmid"><span class="lbname">Angel</span></div><div class="pct">20</div></div>
+              <div class="lbrow"><span class="rank">3</span><div class="lbmid"><span class="lbname">Paul</span></div><div class="pct">19</div></div>
+            </div>
+            <button class="btn ghost" type="button" style="margin-top:14px;">Download Report (PDF)</button>
+          </div>
+        </div>
+        <div class="scaption">D · Charts and awards</div>
+      </div>
+
     </div>
 
     <!-- DEFINES -->
@@ -525,6 +550,7 @@ Danny Thomas BU</textarea>
       <li><span class="n">02</span><span><span class="dt">Amber and steel</span><span class="dd">A near black base, with a single electric amber accent for what has been earned and a quiet steel for what is close.</span></span></li>
       <li><span class="n">03</span><span><span class="dt">Condensed and precise</span><span class="dd">Uppercase labels, tabular rows, hairline rules, and sharp corners give it the discipline of a training log.</span></span></li>
       <li><span class="n">04</span><span><span class="dt">A sense of standing</span><span class="dd">Eligibility reads like a ranked board, where slim meters and status tags make steady progress visible.</span></span></li>
+      <li><span class="n">05</span><span><span class="dt">Nothing from today is lost</span><span class="dd">The Charts and Analytics graphs, the monthly awards, and the one tap PDF download all carry over.</span></span></li>
     </ul>
 
     <!-- CHOOSE -->
