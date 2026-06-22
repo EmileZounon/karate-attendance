@@ -10,7 +10,7 @@ import ChartsTab from './components/ChartsTab';
 import ManageStudentsTab from './components/ManageStudentsTab';
 import PasswordGate from './components/PasswordGate';
 
-const TABS = ['Today', 'Attendance', 'Grading', 'Awards', 'Charts', 'Analytics', 'Manage Students'];
+const TABS = ['Today', 'Attendance', 'Dan Exam', 'Awards', 'Charts', 'Analytics', 'Manage Students'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function App() {
@@ -116,7 +116,7 @@ export default function App() {
             updateBoth={updateBoth}
           />
         )}
-        {activeTab === 'Grading' && (
+        {activeTab === 'Dan Exam' && (
           <GradingTab
             students={sortedStudents}
             attendance={data.attendance}
@@ -124,7 +124,7 @@ export default function App() {
         )}
         {activeTab === 'Awards' && (
           <AwardsTab
-            students={sortedStudents}
+            students={sortedStudents.filter(s => !INSTRUCTORS.includes(s))}
             attendance={data.attendance}
           />
         )}

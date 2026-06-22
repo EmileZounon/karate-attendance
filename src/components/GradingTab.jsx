@@ -8,7 +8,7 @@ import { GRADING_DATE, grading2026 } from '../data/grading2026';
 const RANKS = [
   { key: 'shodan',      kanji: '初段', title: 'Shodan',                  label: 'New 1st-degree black belts', accent: 'gold' },
   { key: 'nidan',       kanji: '弐段', title: 'Nidan',                   label: 'New 2nd-degree black belts', accent: 'gold' },
-  { key: 'instructors', kanji: '師範', title: 'JKA instructors & judges', label: 'Newly licensed by the JKA',  accent: 'indigo' },
+  { key: 'instructors', kanji: '指導員', title: 'JKA instructors & judges', label: 'Newly licensed by the JKA',  accent: 'indigo' },
 ];
 
 export default function GradingTab({ students = [], attendance = {} }) {
@@ -24,8 +24,8 @@ export default function GradingTab({ students = [], attendance = {} }) {
   return (
     <div className="max-w-md mx-auto">
       <header className="mb-6">
-        <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim">昇段 · Grading</div>
-        <h2 className="font-serif text-2xl text-gi mt-1">Grading 2026</h2>
+        <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim">昇段 · Dan Exam</div>
+        <h2 className="font-serif text-2xl text-gi mt-1">Dan Exam 2026</h2>
         <p className="text-sm text-gidim mt-0.5">JKA · {GRADING_DATE}</p>
         <span className="dojo-brush mt-3" />
       </header>

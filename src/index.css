@@ -5,11 +5,11 @@
 /* ── Dojo (Direction 01 · 道場) base ───────────────────────────── */
 body {
   font-family: 'Zen Kaku Gothic New', system-ui, -apple-system, sans-serif;
-  background-color: #15110F;
+  background-color: #241F1B;
   color: #EFE7D8;
   background-image:
-    radial-gradient(120% 60% at 50% -10%, rgba(62,92,130,0.18), transparent 60%),
-    radial-gradient(100% 40% at 100% 0%, rgba(210,59,44,0.10), transparent 55%);
+    radial-gradient(120% 60% at 50% -10%, rgba(62,92,130,0.16), transparent 60%),
+    radial-gradient(100% 40% at 100% 0%, rgba(210,59,44,0.09), transparent 55%);
   background-attachment: fixed;
 }
 

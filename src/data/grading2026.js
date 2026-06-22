@@ -8,7 +8,7 @@ export const grading2026 = {
   // 初段 — new 1st-degree black belts
   shodan: ['Ewa', 'Bruce', 'Ricardo', 'Varak', 'Peiqi'],
   // 弐段 — new 2nd-degree black belts
-  nidan: ['Jules', 'Emile'],
+  nidan: ['Julia', 'Emile'],
   // newly JKA-licensed instructors & judges
   instructors: ['Angel', 'Ib'],
 };
