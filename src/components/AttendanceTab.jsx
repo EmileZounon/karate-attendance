@@ -48,14 +48,14 @@ export default function AttendanceTab({ students, attendance, updateAttendance, 
       />
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
-        <p className="text-sm text-gidim">
+        <p className="text-sm text-gray-600">
           Click cells to toggle: 0 (Absent) &harr; 1 (Present)
         </p>
         <div className="flex gap-2 items-center">
           <select
             value={activeMonth}
             onChange={e => setActiveMonth(e.target.value)}
-            className="px-3 py-2 rounded-lg text-sm bg-sumi3 border border-line2 text-gi focus:border-hinomaru focus:outline-none"
+            className="px-3 py-2 border rounded-lg text-sm bg-white"
           >
             <option value="">All months</option>
             {monthOptions.map(m => (
@@ -65,14 +65,14 @@ export default function AttendanceTab({ students, attendance, updateAttendance, 
         </div>
       </div>
 
-      <div className="overflow-auto max-h-[75vh] border border-line rounded-lg shadow-sm">
+      <div className="overflow-auto max-h-[75vh] border rounded-lg shadow-sm">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-sumi3 text-gidim">
-              <th className="px-3 py-2 text-left font-serif sticky left-0 top-0 bg-sumi3 z-30">Date</th>
-              <th className="px-3 py-2 text-center font-bold font-serif sticky top-0 bg-sumi3 z-20">Total</th>
+            <tr className="bg-blue-600 text-white">
+              <th className="px-3 py-2 text-left sticky left-0 top-0 bg-blue-600 z-30">Date</th>
+              <th className="px-3 py-2 text-center font-bold sticky top-0 bg-blue-600 z-20">Total</th>
               {students.map(s => (
-                <th key={s} className="px-3 py-2 text-center whitespace-nowrap sticky top-0 bg-sumi3 z-20">{s}</th>
+                <th key={s} className="px-3 py-2 text-center whitespace-nowrap sticky top-0 bg-blue-600 z-20">{s}</th>
               ))}
             </tr>
           </thead>
@@ -84,12 +84,12 @@ export default function AttendanceTab({ students, attendance, updateAttendance, 
               return (
                 <tr
                   key={date}
-                  className={`border-b border-line ${i % 2 === 0 ? 'bg-sumi2' : 'bg-sumi'}`}
+                  className={`border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                 >
-                  <td className="px-3 py-2 font-medium text-gi whitespace-nowrap sticky left-0 bg-inherit z-10">
+                  <td className="px-3 py-2 font-medium whitespace-nowrap sticky left-0 bg-inherit z-10">
                     {formatDate(date)}
                   </td>
-                  <td className="px-3 py-2 text-center font-bold text-gi">
+                  <td className="px-3 py-2 text-center font-bold">
                     {hasData ? total : ''}
                   </td>
                   {students.map(student => {

@@ -54,23 +54,23 @@ export default function ImportWordDoc({ students, onImport }) {
   };
 
   return (
-    <div className="p-4 border border-dashed border-line2 rounded-lg bg-sumi2">
-      <h3 className="font-serif font-bold mb-2 text-gi">Import from Word Document</h3>
-      <p className="text-sm text-gidim mb-3">
+    <div className="p-4 border rounded-lg bg-gray-50">
+      <h3 className="font-bold mb-2">Import from Word Document</h3>
+      <p className="text-sm text-gray-600 mb-3">
         Upload an attendance report (.docx) to import student names and statistics.
       </p>
       <input
         type="file"
         accept=".docx"
         onChange={handleFileChange}
-        className="block w-full text-sm text-gidim bg-sumi3 border border-line2 rounded file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-hinomaru file:text-white hover:file:bg-hinomarudeep"
+        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
       />
 
       {status && (
-        <div className={`mt-3 p-3 rounded text-sm border border-line2 ${
-          status.type === 'error' ? 'bg-sumi3 text-hinomaru' :
-          status.type === 'loading' ? 'bg-sumi3 text-gold' :
-          'bg-sumi3 text-indigosoft'
+        <div className={`mt-3 p-3 rounded text-sm ${
+          status.type === 'error' ? 'bg-red-100 text-red-700' :
+          status.type === 'loading' ? 'bg-yellow-100 text-yellow-700' :
+          'bg-green-100 text-green-700'
         }`}>
           {status.message}
         </div>
@@ -79,7 +79,7 @@ export default function ImportWordDoc({ students, onImport }) {
       {importResult && importResult.newStudents.length > 0 && (
         <button
           onClick={confirmImport}
-          className="mt-3 px-4 py-2 dojo-cta rounded transition-colors"
+          className="mt-3 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
         >
           Add {importResult.newStudents.length} New Student{importResult.newStudents.length > 1 ? 's' : ''}
         </button>

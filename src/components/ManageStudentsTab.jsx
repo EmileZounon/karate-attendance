@@ -196,8 +196,8 @@ export default function ManageStudentsTab({
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Add Student */}
-      <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Add Student</h2>
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">Add Student</h2>
         <div className="flex gap-2">
           <input
             type="text"
@@ -205,11 +205,11 @@ export default function ManageStudentsTab({
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addStudent()}
             placeholder="Student name"
-            className="flex-1 px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg focus:outline-none focus:border-hinomaru"
+            className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={addStudent}
-            className="dojo-cta px-4 py-2"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
           >
             Add
           </button>
@@ -220,13 +220,13 @@ export default function ManageStudentsTab({
       <PasteNamesBulkAdd students={students} onAdd={handleBulkAdd} />
 
       {/* Student List */}
-      <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">
           Current Students ({students.length})
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {students.map(name => (
-            <div key={name} className="flex items-center gap-2 p-2 bg-sumi3 border border-line rounded-lg">
+            <div key={name} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
               {editingName === name ? (
                 <>
                   <input
@@ -234,16 +234,16 @@ export default function ManageStudentsTab({
                     value={editValue}
                     onChange={e => setEditValue(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingName(null); }}
-                    className="flex-1 px-2 py-1 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-sm focus:outline-none focus:border-hinomaru"
+                    className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button onClick={saveEdit} className="text-indigosoft hover:text-gi text-sm font-medium">Save</button>
-                  <button onClick={() => setEditingName(null)} className="text-gifaint hover:text-gidim text-sm">Cancel</button>
+                  <button onClick={saveEdit} className="text-green-600 hover:text-green-800 text-sm font-medium">Save</button>
+                  <button onClick={() => setEditingName(null)} className="text-gray-400 hover:text-gray-600 text-sm">Cancel</button>
                 </>
               ) : (
                 <>
-                  <span className="flex-1 font-medium text-gi">{name}</span>
-                  <button onClick={() => startEdit(name)} className="text-indigosoft hover:text-gi text-sm font-medium">Edit</button>
-                  <button onClick={() => removeStudent(name)} className="text-hinomaru hover:text-hinomarudeep text-sm font-medium">Remove</button>
+                  <span className="flex-1 font-medium">{name}</span>
+                  <button onClick={() => startEdit(name)} className="text-blue-500 hover:text-blue-700 text-sm font-medium">Edit</button>
+                  <button onClick={() => removeStudent(name)} className="text-red-500 hover:text-red-700 text-sm font-medium">Remove</button>
                 </>
               )}
             </div>
@@ -257,28 +257,28 @@ export default function ManageStudentsTab({
       </section>
 
       {/* Backup & Restore */}
-      <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Backup & Restore</h2>
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">Backup & Restore</h2>
         <button
           onClick={loadBackups}
           disabled={loadingBackups}
-          className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
           {loadingBackups ? 'Loading...' : 'Load Backups'}
         </button>
         {backups.length > 0 && (
           <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
             {backups.map(b => (
-              <div key={b.id} className="flex items-center justify-between p-2 bg-sumi3 border border-line rounded-lg text-sm">
+              <div key={b.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
                 <div>
-                  <span className="font-medium text-gi">{new Date(b.backupAt).toLocaleString()}</span>
-                  <span className="text-gifaint ml-2">
+                  <span className="font-medium">{new Date(b.backupAt).toLocaleString()}</span>
+                  <span className="text-gray-500 ml-2">
                     ({b.students?.length || 0} students, {Object.keys(b.attendance || {}).length} dates)
                   </span>
                 </div>
                 <button
                   onClick={() => restoreBackup(b)}
-                  className="px-3 py-1 bg-indigoink text-gi rounded-lg text-xs hover:bg-indigosoft transition-colors"
+                  className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors"
                 >
                   Restore
                 </button>
@@ -287,49 +287,49 @@ export default function ManageStudentsTab({
           </div>
         )}
         {backups.length === 0 && !loadingBackups && (
-          <p className="text-xs text-gifaint mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Auto-backups are created every 5 minutes when you make changes. Click above to check for available backups.
           </p>
         )}
       </section>
 
       {/* Export / Import JSON */}
-      <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Data Management</h2>
+      <section className="p-4 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-lg font-bold mb-3">Data Management</h2>
         <div className="space-y-3">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={exportExcel}
-              className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors"
+              className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition-colors"
             >
               Export as Excel
             </button>
             <button
               onClick={exportJSON}
-              className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               Export Data (JSON)
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gidim mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Import Data (JSON)
             </label>
             <input
               type="file"
               accept=".json"
               onChange={handleImportJSON}
-              className="block w-full text-sm text-gifaint file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-sumi3 file:text-gi hover:file:bg-line2"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-600 file:text-white hover:file:bg-gray-700"
             />
           </div>
-          <div className="pt-3 border-t border-line2">
+          <div className="pt-3 border-t">
             <button
               onClick={handleReset}
-              className="dojo-ghost px-4 py-2 text-hinomaru border-hinomaru"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
             >
               Reset to Defaults
             </button>
-            <p className="text-xs text-gifaint mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Restores original 16 students and January 2026 attendance data.
             </p>
           </div>
