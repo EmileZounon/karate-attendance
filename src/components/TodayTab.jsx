@@ -93,7 +93,7 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
                 {showStreak && (
                   <>
                     {' · '}
-                    {topStreaker.name} on a {topStreaker.currentStreak}-class streak
+                    {topStreaker.name}, {topStreaker.currentStreak} consecutive classes
                   </>
                 )}
               </div>
@@ -125,13 +125,13 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
                 {firstThree.map((s) => s.name).join(' · ')}
               </div>
               {moreRegulars > 0 && (
-                <div className="text-gidim text-sm mt-0.5">+ {moreRegulars} regulars</div>
+                <div className="text-gidim text-sm mt-0.5">and {moreRegulars} more regular attendees</div>
               )}
             </div>
           </div>
         ) : (
           <div className="text-gidim text-sm">
-            No regulars yet. Record a few classes and they'll show up here.
+            No regular attendees yet. Record a few classes to populate this list.
           </div>
         )}
       </div>

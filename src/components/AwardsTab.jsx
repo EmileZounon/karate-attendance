@@ -60,13 +60,13 @@ export default function AwardsTab({ students, attendance }) {
           <h2 className="text-2xl font-serif font-bold text-gi">Awards</h2>
           <span className="font-serif text-gold/80 text-xl" aria-hidden="true">賞</span>
         </div>
-        <p className="text-gidim mt-1">Who showed up the most</p>
+        <p className="text-gidim mt-1">Recognizing the most consistent attendance</p>
         <span className="dojo-brush mt-2" />
       </header>
 
       {months.length === 0 ? (
         <div className="dojo-card p-6 text-center text-gidim">
-          No classes recorded yet. Awards appear once attendance is in.
+          No classes recorded yet. Awards will appear once attendance has been entered.
         </div>
       ) : (
         <div className="space-y-5">
@@ -96,7 +96,7 @@ export default function AwardsTab({ students, attendance }) {
             </h3>
             {monthlyPodium.length === 0 ? (
               <p className="text-gifaint text-sm py-2">
-                No one logged a class this month yet.
+                No attendance recorded for this month yet.
               </p>
             ) : (
               monthlyPodium.map((r, i) => (
@@ -116,7 +116,7 @@ export default function AwardsTab({ students, attendance }) {
           <section className="dojo-card p-4">
             <h3 className="font-serif text-gi mb-2">All-time</h3>
             {allTimePodium.length === 0 ? (
-              <p className="text-gifaint text-sm py-2">No students yet.</p>
+              <p className="text-gifaint text-sm py-2">No students recorded yet.</p>
             ) : (
               allTimePodium.map((r, i) => (
                 <AwardRow

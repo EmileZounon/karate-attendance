@@ -49,7 +49,7 @@ export default function GradingTab() {
 
       <div className="text-center mt-8">
         <span className="dojo-brush mx-auto mb-3" />
-        <p className="text-sm text-gifaint">押忍 · congratulations to every grade</p>
+        <p className="text-sm text-gifaint">押忍 · Congratulations to every new grade</p>
       </div>
     </div>
   );
