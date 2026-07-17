@@ -237,7 +237,7 @@ const LABEL_BY_WEEKDAY = { 0: '2:00', 2: '1:15', 4: '1:15' };
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const STATUS_TEXT = { present: 'Present', absent: 'Absent', norecord: 'No record taken', upcoming: 'Scheduled' };
+const STATUS_TEXT = { present: 'Present', absent: 'Absent', norecord: 'No class scheduled', upcoming: 'Scheduled' };
 const STATUS_FILL = { present: 'var(--wc-blue)', absent: 'var(--absent)', norecord: 'var(--norecord)' };
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -261,8 +261,13 @@ function classDates() {
 }
 
 /**
- * A day nobody was marked on is "no record taken", NOT an absence for her —
+ * A day nobody was marked on is reported as "No class scheduled", never an absence —
  * the distinction matters on a document going to a registrar.
+ *
+ * CAVEAT: this is an inference, not a fact. All we know is that no student was marked.
+ * That reads as "no class was held" only while attendance is actually being taken for
+ * the classes that DO run; a held-but-unrecorded class lands in this same branch and
+ * would be reported to the college as though it never happened.
  */
 function statusFor(dateStr, row, today) {
   if (dateStr > today) return 'upcoming';
@@ -375,7 +380,7 @@ function render(attendance) {
     <div class="legend">
       <span><i class="sw" style="background:var(--wc-blue)"></i>Attended</span>
       <span><i class="sw" style="background:var(--absent)"></i>Absent</span>
-      <span><i class="sw" style="background:var(--norecord);border:1px solid var(--rule)"></i>No record taken</span>
+      <span><i class="sw" style="background:var(--norecord);border:1px solid var(--rule)"></i>No class scheduled</span>
       <span><i class="sw" style="border:1.5px dashed var(--muted);background:none"></i>Scheduled (not yet held)</span>
     </div>
     \${chartSVG(rows)}
@@ -416,7 +421,7 @@ function render(attendance) {
         <li>Class length is fixed by schedule: Tuesday 1:15, Thursday 1:15, Sunday 2:00.</li>
         <li>June: \${fmtHours(byMonth[0].hours)} across \${byMonth[0].classes} classes. July: \${fmtHours(byMonth[1].hours)} across \${byMonth[1].classes} classes.</li>
         \${upcoming.length ? \`<li>\${upcoming.length} classes remain scheduled through July 31 and are shown as pending. If \${STUDENT} attends all of them, her term total reaches \${fmtHours(potential)}.</li>\` : ''}
-        \${norecord.length ? \`<li>\${norecord.length} scheduled \${norecord.length === 1 ? 'class' : 'classes'} (\${norecord.map((r) => r.label).join(', ')}) \${norecord.length === 1 ? 'has' : 'have'} no attendance record for any student and \${norecord.length === 1 ? 'is' : 'are'} therefore not counted as an absence. Her total is a verified minimum.</li>\` : ''}
+        \${norecord.length ? \`<li>No class was held on \${norecord.length} \${norecord.length === 1 ? 'date' : 'dates'} in the regular Tuesday, Thursday and Sunday pattern (\${norecord.map((r) => r.label).join(', ')}), so \${norecord.length === 1 ? 'it is' : 'they are'} not counted against her attendance.</li>\` : ''}
         <li>Attendance is recorded live in the club's attendance system at each class.</li>
       </ul>
     </div>
