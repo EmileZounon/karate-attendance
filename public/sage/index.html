@@ -105,6 +105,22 @@
 
   .loading { padding: 60px 0; text-align: center; color: var(--muted); font-family: system-ui, sans-serif; }
 
+  /* Instructions for whoever keeps the record. Screen only: this is scaffolding
+     for the person filling it in, never part of the document the college receives. */
+  .crew {
+    max-width: 8.5in; margin: 0 auto 60px; padding: 18px 22px;
+    background: #fff; border: 1px solid var(--rule); border-left: 3px solid var(--wc-blue);
+    border-radius: 2px; font-family: system-ui, -apple-system, sans-serif; font-size: 9.5pt;
+    color: var(--ink-2); line-height: 1.55;
+  }
+  .crew h3 { margin: 0 0 8px; font-size: 10pt; color: var(--wc-blue); }
+  .crew ol { margin: 0 0 12px; padding-left: 18px; }
+  .crew li { margin-bottom: 5px; }
+  .crew .phone { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--grid); }
+  .crew strong { color: var(--ink); }
+  .crew p:last-child { margin-bottom: 0; }
+  @media print { .crew { display: none !important; } }
+
   @media print {
     body { background: #fff; }
     .sheet { max-width: none; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
@@ -148,6 +164,34 @@
   <p class="sub">Verified attendance and contact hours, Summer 2026 term.</p>
 
   <div id="body"><div class="loading">Loading attendance…</div></div>
+</div>
+
+<div class="crew">
+  <h3>Cassiano, this one is for you</h3>
+  <p>Sage Wilder needs these hours to finish her PE requirement at Wellesley, so the record
+  has to be complete before it goes to the college. Some class days have no attendance saved
+  for anyone, and they show as <strong>No record taken</strong>. If you remember she was
+  there, mark her and the total updates itself.</p>
+  <ol>
+    <li>Tap <strong>Fill out attendance</strong> at the top.</li>
+    <li>On each date, tap <strong>Present</strong>, <strong>Absent</strong>, or
+        <strong>Clear</strong> if you are not sure. Each tap saves on its own, there is no
+        save button and nothing to submit.</li>
+    <li>It writes to the same attendance system the app uses, so the change is live for
+        everyone straight away.</li>
+    <li>Tap <strong>Done editing</strong> when the sheet looks right.</li>
+  </ol>
+  <p>The buttons and this note never appear on the printed page. What prints is just her
+  record, with a line for Vazrik to sign.</p>
+  <div class="phone">
+    <p><strong>Saving it as a PDF on your phone</strong></p>
+    <p><strong>iPhone:</strong> tap <strong>Print / Save as PDF</strong>, wait for the preview,
+    then tap the share icon in the top right and choose <strong>Save to Files</strong>.</p>
+    <p><strong>Android:</strong> tap <strong>Print / Save as PDF</strong>, then set the
+    destination to <strong>Save as PDF</strong> and tap save.</p>
+    <p>On a computer the same button opens the normal print dialog, where the destination
+    can be a printer or a PDF.</p>
+  </div>
 </div>
 
 <script type="module">
