@@ -105,13 +105,56 @@
 
   .loading { padding: 60px 0; text-align: center; color: var(--muted); font-family: system-ui, sans-serif; }
 
+  /* Paper is a hard constraint: two Letter sheets, even if the print dialog adds
+     headers/footers, widens margins, or scales up. Content runs ~13.5in against 19.6in
+     of usable paper, so this stays gentle on purpose — the earlier 3-page prints came
+     from the phone breakpoint leaking onto paper, not from the record being too tall.
+     Squeezing the type further would cost legibility on a document a registrar reads. */
   @media print {
-    body { background: #fff; }
+    body { background: #fff; font-size: 10pt; line-height: 1.36; }
     .sheet { max-width: none; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
     .bar, .mark { display: none !important; }
-    tbody tr { break-inside: avoid; }
+
+    header { padding-bottom: 11px; }
+    header svg { width: 48px; height: 48px; }
+    .org { font-size: 14pt; }
+    h1 { font-size: 16pt; margin: 13px 0 2px; }
+    .sub { margin-bottom: 13px; }
+
+    /* Hours completed / still scheduled / term total sit side by side on one line. */
+    .tiles { grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 13px; }
+    .tile { padding: 9px 12px; }
+    .tile .v { font-size: 21pt; margin-top: 3px; }
+
+    h2 { padding-bottom: 4px; margin-bottom: 9px; }
+    section { margin-bottom: 14px; }
+    .legend { margin-bottom: 6px; }
+    /* Full width would make the chart ~2.1in tall; it reads fine smaller and the
+       height is the scarce resource on paper. */
+    svg { max-height: 1.7in; }
+
+    table { font-size: 9pt; }
+    thead th { padding-bottom: 4px; }
+    td { padding: 2.5px 8px; }
+    tfoot td { padding-top: 6px; }
+
+    .note { padding: 8px 11px; font-size: 8.6pt; }
+    .note li { margin-bottom: 2px; }
+
+    /* A signature line stranded alone on a third sheet reads as a missing page. */
+    .sign { margin-top: 20px; padding-top: 11px; }
+    .sign .line { height: 27px; }
+    /* Only small blocks are atomic. The class-by-class section is ~6in tall: making it
+       unbreakable pushes the whole table to the next sheet the moment it overflows,
+       which costs a page rather than saving one. It must stay free to split. */
+    .note, .sign, tbody tr { break-inside: avoid; }
+    thead { display: table-header-group; }
   }
-  @media (max-width: 800px) {
+  /* Phone rules, and ONLY phone rules. Without "screen" these also hit paper: Chrome
+     resolves print media queries against the page area (~7.3in ≈ 700px at Letter with
+     0.6in margins), which is under this breakpoint, so the tiles would silently stack
+     into three rows on the printed record. */
+  @media screen and (max-width: 800px) {
     body { background: #fff; }
     .sheet { margin: 0; padding: 20px; border-radius: 0; box-shadow: none; }
     .bar { margin-top: 10px; padding: 0 20px; flex-wrap: wrap; }
