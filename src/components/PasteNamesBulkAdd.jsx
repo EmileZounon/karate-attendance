@@ -71,7 +71,8 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
       {open && (
         <div className="mt-3 space-y-3">
           <p className="text-sm text-gidim">
-            Paste a list of names (one per line, or separated by commas). The app
+            Paste a list of names, one per line or separated by commas. Forgot
+            the commas? A single line like "angel ib emile" works too. The app
             adds only the new ones and skips anyone already on the roster.
           </p>
           <textarea

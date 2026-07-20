@@ -64,5 +64,47 @@ Danny Thomas BU`;
   eq(r.skipped, [], 'whitespace-only -> nothing skipped (empty lines dropped silently)');
 }
 
+// 6. Forgotten commas: a single line with no explicit separator splits on spaces.
+{
+  const r = parseNameList('angel ib emile', []);
+  eq(names(r), ['angel', 'ib', 'emile'], 'space-separated single line -> 3 names');
+}
+
+// 7. Space-splitting must NOT kick in once an explicit separator is present.
+{
+  const r = parseNameList('Danny Thomas BU\nAmandine', []);
+  eq(names(r), ['Danny Thomas BU', 'Amandine'], 'newline present -> spaces preserved');
+
+  const r2 = parseNameList('Danny Thomas BU, Amandine', []);
+  eq(names(r2), ['Danny Thomas BU', 'Amandine'], 'comma present -> spaces preserved');
+}
+
+// 8. Space-split names still dedup against the roster, case-insensitively.
+{
+  const r = parseNameList('angel IB julia', ['Angel', 'Ib']);
+  eq(names(r), ['julia'], 'space-split -> roster dupes removed');
+  eq(r.duplicates, ['Angel', 'Ib'], 'space-split -> dupes reported with roster spelling');
+}
+
+// 9. Space-split junk (dates, class numbers) is still filtered out.
+{
+  const r = parseNameList('Vazrik Amandine class 19', []);
+  eq(names(r), ['Vazrik', 'Amandine', 'class'], 'space-split -> digit token skipped');
+  eq(skippedLines(r), ['19'], 'space-split -> "19" skipped as junk');
+}
+
+// 10. A trailing comma / newline is punctuation, not a boundary: still splits on spaces.
+{
+  eq(names(parseNameList('angel ib emile,', [])), ['angel', 'ib', 'emile'], 'trailing comma ignored');
+  eq(names(parseNameList('angel ib emile\n', [])), ['angel', 'ib', 'emile'], 'trailing newline ignored');
+  eq(names(parseNameList('angel ib emile ;\n', [])), ['angel', 'ib', 'emile'], 'trailing semicolon+space ignored');
+}
+
+// 11. A LEADING comma is a real boundary (empty first field) -> no space-splitting.
+{
+  const r = parseNameList(',Danny Thomas BU', []);
+  eq(names(r), ['Danny Thomas BU'], 'leading comma still counts as explicit');
+}
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
