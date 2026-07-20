@@ -118,3 +118,49 @@ export const getPctClass = (pct) => {
   if (pct >= 50) return 'pct-mid';
   return 'pct-low';
 };
+
+// ── Black belt camp eligibility (Dojo experience) ──────────────────
+// Rule: share of all recorded classes attended.
+//   Ready >= 85%, Close 70–84%, Not yet < 70%.
+export const ELIGIBILITY = { ready: 85, close: 70 };
+
+export const eligibilityStatus = (pct) => {
+  if (pct >= ELIGIBILITY.ready) return 'Ready';
+  if (pct >= ELIGIBILITY.close) return 'Close';
+  return 'Not yet';
+};
+
+// Per-student eligibility, ranked by attendance %.
+// Returns [{ name, attended, total, percentage, status }]
+export const calculateEligibility = (students, dates, attendance) => {
+  return calculateStudentStats(students, dates, attendance)
+    .map(s => ({ ...s, status: eligibilityStatus(s.percentage) }))
+    .sort((a, b) => b.percentage - a.percentage || a.name.localeCompare(b.name));
+};
+
+// Top 3 attenders for a given month key (e.g. "2026-06").
+// Returns [{ name, attended, total }] (medal order).
+export const getMonthlyPodium = (students, dates, attendance, monthKey) => {
+  const held = getClassesHeld(dates, attendance).filter(d => getMonthKey(d) === monthKey);
+  return students
+    .map(s => ({
+      name: s,
+      attended: held.filter(d => attendance[d]?.[s] === 1).length,
+      total: held.length,
+    }))
+    .filter(r => r.attended > 0)
+    .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name))
+    .slice(0, 3);
+};
+
+// Program snapshot for the Today landing.
+// Returns { classesHeld, lastClass, lastPresent }
+export const getProgramSnapshot = (dates, attendance) => {
+  const held = getClassesHeld(dates, attendance).slice().sort();
+  const lastClass = held[held.length - 1] || null;
+  return {
+    classesHeld: held.length,
+    lastClass,
+    lastPresent: lastClass ? countPresent(lastClass, attendance) : 0,
+  };
+};

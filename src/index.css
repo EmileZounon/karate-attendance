@@ -2,32 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Dojo (Direction 01 · 道場) base ───────────────────────────── */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Zen Kaku Gothic New', system-ui, -apple-system, sans-serif;
+  background-color: #241F1B;
+  color: #EFE7D8;
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, rgba(62,92,130,0.16), transparent 60%),
+    radial-gradient(100% 40% at 100% 0%, rgba(210,59,44,0.09), transparent 55%);
+  background-attachment: fixed;
 }
 
-/* Attendance grid cell styling */
+/* Brush-stroke divider (sumi red), reusable: <span class="dojo-brush" /> */
+.dojo-brush {
+  display: block; height: 10px; width: 96px;
+  background: linear-gradient(90deg, #D23B2C, #A82A1E);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='10'%3E%3Cpath d='M1 6 C18 2 30 9 46 5 C62 1 78 8 95 4 L95 9 C78 12 60 6 44 9 C28 12 16 6 1 9 Z' fill='black'/%3E%3C/svg%3E") no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='10'%3E%3Cpath d='M1 6 C18 2 30 9 46 5 C62 1 78 8 95 4 L95 9 C78 12 60 6 44 9 C28 12 16 6 1 9 Z' fill='black'/%3E%3C/svg%3E") no-repeat;
+}
+
+/* Card surface, reusable: <div class="dojo-card"> */
+.dojo-card {
+  @apply bg-sumi2 border border-line2 rounded-xl;
+}
+
+/* Primary action = hinomaru red seal */
+.dojo-cta {
+  @apply bg-hinomaru text-white font-bold rounded-xl hover:bg-hinomarudeep transition-colors;
+}
+/* Secondary = outline on canvas */
+.dojo-ghost {
+  @apply bg-transparent border border-line2 text-gi font-bold rounded-xl hover:bg-sumi3 transition-colors;
+}
+
+/* Attendance grid cells — present is "stamped" with the red seal */
 .cell-present {
-  @apply bg-green-100 text-green-800 font-bold cursor-pointer hover:bg-green-200;
+  @apply bg-hinomaru/25 text-[#E8786C] font-bold cursor-pointer hover:bg-hinomaru/40;
 }
 .cell-absent {
-  @apply bg-red-100 text-red-800 font-bold cursor-pointer hover:bg-red-200;
+  @apply bg-sumi3 text-gifaint cursor-pointer hover:bg-sumi2;
 }
 .cell-empty {
-  @apply bg-white cursor-pointer hover:bg-gray-100;
+  @apply bg-sumi2/50 cursor-pointer hover:bg-sumi3;
 }
 
-/* Percentage color coding */
-.pct-high { @apply text-green-700 font-semibold; }
-.pct-mid { @apply text-yellow-600 font-semibold; }
-.pct-low { @apply text-red-600 font-semibold; }
+/* Percentage color coding — gold marks what's earned */
+.pct-high { @apply text-gold font-semibold; }
+.pct-mid  { @apply text-indigosoft font-semibold; }
+.pct-low  { @apply text-gifaint font-semibold; }
 
-/* Tab styling */
+/* Tabs */
 .tab-active {
-  @apply bg-blue-600 text-white;
+  @apply bg-hinomaru text-white;
 }
 .tab-inactive {
-  @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50;
+  @apply bg-sumi2 text-gidim border border-line2 hover:bg-sumi3 hover:text-gi;
 }
 
 /* Print/PDF styling */

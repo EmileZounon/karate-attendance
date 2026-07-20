@@ -14,10 +14,10 @@ import {
 import { downloadPDF } from '../utils/pdfExport';
 
 const COLORS = [
-  '#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea',
-  '#0891b2', '#c2410c', '#4f46e5', '#059669', '#e11d48',
-  '#7c3aed', '#0d9488', '#b91c1c', '#a16207', '#6d28d9',
-  '#15803d',
+  '#D23B2C', '#3E5C82', '#C8A24B', '#A52E22', '#5A7BA6',
+  '#B8923F', '#D23B2C', '#3E5C82', '#C8A24B', '#A52E22',
+  '#5A7BA6', '#B8923F', '#D23B2C', '#3E5C82', '#C8A24B',
+  '#A52E22',
 ];
 
 export default function ChartsTab({ students, attendance }) {
@@ -68,7 +68,7 @@ export default function ChartsTab({ students, attendance }) {
   const charts = {
     total: (
       <section key="total">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Total Attendance by Student</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">Total Attendance by Student</h2>
         <div className="h-64 sm:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={studentStats} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -90,7 +90,7 @@ export default function ChartsTab({ students, attendance }) {
       monthlyStudentData.map(({ monthKey, label, data }) => [
         `month-${monthKey}`,
         <section key={monthKey}>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">{label} — Attendance by Student</h2>
+          <h2 className="text-xl font-serif font-bold text-gi mb-4">{label} — Attendance by Student</h2>
           <div className="h-64 sm:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -111,7 +111,7 @@ export default function ChartsTab({ students, attendance }) {
     ),
     'monthly-total': (
       <section key="monthly-total">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly Total Attendance</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">Monthly Total Attendance</h2>
         <div className="h-56 sm:h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlySummary} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -119,8 +119,8 @@ export default function ChartsTab({ students, attendance }) {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="totalAttendance" name="Total Attendance" fill="#2563eb" />
-              <Bar dataKey="classesHeld" name="Classes Held" fill="#16a34a" />
+              <Bar dataKey="totalAttendance" name="Total Attendance" fill="#D23B2C" />
+              <Bar dataKey="classesHeld" name="Classes Held" fill="#3E5C82" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -128,7 +128,7 @@ export default function ChartsTab({ students, attendance }) {
     ),
     'per-class': (
       <section key="per-class">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Students per Class Over Time</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">Students per Class Over Time</h2>
         <div className="h-56 sm:h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={classAttendanceData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -139,7 +139,7 @@ export default function ChartsTab({ students, attendance }) {
               <Line
                 type="monotone"
                 dataKey="students"
-                stroke="#2563eb"
+                stroke="#D23B2C"
                 strokeWidth={2}
                 dot={{ r: 5 }}
                 name="Students Present"
@@ -158,7 +158,7 @@ export default function ChartsTab({ students, attendance }) {
           <select
             value={activeChart}
             onChange={e => setActiveChart(e.target.value)}
-            className="px-3 py-2 border rounded-lg text-sm bg-white"
+            className="px-3 py-2 border border-line2 rounded-lg text-sm bg-sumi2 text-gi"
           >
             <option value="">All charts</option>
             {chartOptions.map(c => (
@@ -168,13 +168,13 @@ export default function ChartsTab({ students, attendance }) {
         </div>
         <button
           onClick={() => downloadPDF('charts-content', 'Karate_Charts_Report', 'landscape')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          className="dojo-ghost px-4 py-2 rounded-lg transition-colors text-sm"
         >
           Download Charts Report (PDF)
         </button>
       </div>
 
-      <div id="charts-content" className="space-y-10 bg-white p-6 rounded-lg">
+      <div id="charts-content" className="space-y-10 bg-sumi2 p-6 rounded-lg">
         {activeChart
           ? charts[activeChart]
           : Object.values(charts)

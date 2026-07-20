@@ -102,10 +102,11 @@ export default function PasswordGate({ children }) {
 
   if (entering) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full mx-4 text-center">
+      <div className="flex items-center justify-center min-h-screen bg-sumi">
+        <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center">
+          <p className="font-serif text-4xl text-hinomaru mb-4">道場</p>
           <p className="text-3xl mb-4">🥋</p>
-          <p className="text-xl font-bold text-blue-800">
+          <p className="font-serif text-xl text-gi">
             OOS. Enter in the Dojo.
           </p>
         </div>
@@ -116,17 +117,17 @@ export default function PasswordGate({ children }) {
   // Lockout screen
   if (lockedUntil) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full mx-4 text-center">
+      <div className="flex items-center justify-center min-h-screen bg-sumi">
+        <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center">
           <p className="text-3xl mb-4">🚫</p>
-          <p className="text-xl font-bold text-red-700 mb-2">
+          <p className="font-serif text-xl text-hinomaru mb-2">
             Hansoku.
           </p>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gidim mb-4">
             You are not among the descendants of Funakoshi and Tabata.
           </p>
           {remaining && (
-            <p className="text-lg font-mono text-gray-800">
+            <p className="text-lg font-mono text-gi">
               Try again in {remaining}
             </p>
           )}
@@ -140,12 +141,14 @@ export default function PasswordGate({ children }) {
     : null;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full mx-4">
-        <h1 className="text-2xl font-bold text-blue-800 text-center mb-2">
+    <div className="flex items-center justify-center min-h-screen bg-sumi">
+      <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center">
+        <p className="font-serif text-4xl text-hinomaru mb-3">道場</p>
+        <h1 className="font-serif text-2xl text-gi text-center mb-2">
           Karate Black Belt Program
         </h1>
-        <p className="text-gray-500 text-center mb-6">
+        <span className="dojo-brush mx-auto mb-4"></span>
+        <p className="text-gifaint text-center mb-6">
           Enter the team password to continue
         </p>
         <form onSubmit={handleSubmit}>
@@ -154,17 +157,17 @@ export default function PasswordGate({ children }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Team password"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-lg"
+            className="w-full px-4 py-3 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg focus:outline-none focus:border-hinomaru text-center text-lg"
             autoFocus
           />
           {errorMessage && (
-            <p className="text-red-500 text-sm text-center mt-2 font-medium">
+            <p className="text-hinomaru text-sm text-center mt-2 font-medium">
               {errorMessage}
             </p>
           )}
           <button
             type="submit"
-            className="w-full mt-4 px-4 py-3 bg-blue-800 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="dojo-cta w-full mt-4 px-4 py-3 rounded-lg font-medium"
           >
             Enter
           </button>
