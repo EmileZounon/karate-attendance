@@ -105,29 +105,56 @@
 
   .loading { padding: 60px 0; text-align: center; color: var(--muted); font-family: system-ui, sans-serif; }
 
-  /* Instructions for whoever keeps the record. Screen only: this is scaffolding
-     for the person filling it in, never part of the document the college receives. */
-  .crew {
-    max-width: 8.5in; margin: 0 auto 60px; padding: 18px 22px;
-    background: #fff; border: 1px solid var(--rule); border-left: 3px solid var(--wc-blue);
-    border-radius: 2px; font-family: system-ui, -apple-system, sans-serif; font-size: 9.5pt;
-    color: var(--ink-2); line-height: 1.55;
-  }
-  .crew h3 { margin: 0 0 8px; font-size: 10pt; color: var(--wc-blue); }
-  .crew ol { margin: 0 0 12px; padding-left: 18px; }
-  .crew li { margin-bottom: 5px; }
-  .crew .phone { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--grid); }
-  .crew strong { color: var(--ink); }
-  .crew p:last-child { margin-bottom: 0; }
-  @media print { .crew { display: none !important; } }
-
+  /* Paper is a hard constraint: two Letter sheets, even if the print dialog adds
+     headers/footers, widens margins, or scales up. Content runs ~13.5in against 19.6in
+     of usable paper, so this stays gentle on purpose — the earlier 3-page prints came
+     from the phone breakpoint leaking onto paper, not from the record being too tall.
+     Squeezing the type further would cost legibility on a document a registrar reads. */
   @media print {
-    body { background: #fff; }
+    body { background: #fff; font-size: 10pt; line-height: 1.36; }
     .sheet { max-width: none; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
     .bar, .mark { display: none !important; }
-    tbody tr { break-inside: avoid; }
+
+    header { padding-bottom: 11px; }
+    header svg { width: 48px; height: 48px; }
+    .org { font-size: 14pt; }
+    h1 { font-size: 16pt; margin: 13px 0 2px; }
+    .sub { margin-bottom: 13px; }
+
+    /* Hours completed / still scheduled / term total sit side by side on one line. */
+    .tiles { grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 13px; }
+    .tile { padding: 9px 12px; }
+    .tile .v { font-size: 21pt; margin-top: 3px; }
+
+    h2 { padding-bottom: 4px; margin-bottom: 9px; }
+    section { margin-bottom: 14px; }
+    .legend { margin-bottom: 6px; }
+    /* Full width would make the chart ~2.1in tall; it reads fine smaller and the
+       height is the scarce resource on paper. */
+    svg { max-height: 1.7in; }
+
+    table { font-size: 9pt; }
+    thead th { padding-bottom: 4px; }
+    td { padding: 2.5px 8px; }
+    tfoot td { padding-top: 6px; }
+
+    .note { padding: 8px 11px; font-size: 8.6pt; }
+    .note li { margin-bottom: 2px; }
+
+    /* A signature line stranded alone on a third sheet reads as a missing page. */
+    .sign { margin-top: 20px; padding-top: 11px; }
+    .sign .line { height: 27px; }
+    /* Only small blocks are atomic. The class-by-class section is ~6in tall: making it
+       unbreakable pushes the whole table to the next sheet the moment it overflows,
+       which costs a page rather than saving one. It must stay free to split. */
+    .note, .sign, tbody tr { break-inside: avoid; }
+    thead { display: table-header-group; }
   }
-  @media (max-width: 800px) {
+  /* Phone rules, and ONLY phone rules. Without "screen" these also hit paper: Chrome
+     resolves print media queries against the page area (~7.3in ≈ 700px at Letter with
+     0.6in margins), which is under this breakpoint, so the tiles would silently stack
+     into three rows on the printed record. */
+  @media screen and (max-width: 800px) {
     body { background: #fff; }
     .sheet { margin: 0; padding: 20px; border-radius: 0; box-shadow: none; }
     .bar { margin-top: 10px; padding: 0 20px; flex-wrap: wrap; }
@@ -166,34 +193,6 @@
   <div id="body"><div class="loading">Loading attendance…</div></div>
 </div>
 
-<div class="crew">
-  <h3>Cassiano, this one is for you</h3>
-  <p>Sage Wilder needs these hours to finish her PE requirement at Wellesley, so the record
-  has to be complete before it goes to the college. Some class days have no attendance saved
-  for anyone, and they show as <strong>No record taken</strong>. If you remember she was
-  there, mark her and the total updates itself.</p>
-  <ol>
-    <li>Tap <strong>Fill out attendance</strong> at the top.</li>
-    <li>On each date, tap <strong>Present</strong>, <strong>Absent</strong>, or
-        <strong>Clear</strong> if you are not sure. Each tap saves on its own, there is no
-        save button and nothing to submit.</li>
-    <li>It writes to the same attendance system the app uses, so the change is live for
-        everyone straight away.</li>
-    <li>Tap <strong>Done editing</strong> when the sheet looks right.</li>
-  </ol>
-  <p>The buttons and this note never appear on the printed page. What prints is just her
-  record, with a line for Vazrik to sign.</p>
-  <div class="phone">
-    <p><strong>Saving it as a PDF on your phone</strong></p>
-    <p><strong>iPhone:</strong> tap <strong>Print / Save as PDF</strong>, wait for the preview,
-    then tap the share icon in the top right and choose <strong>Save to Files</strong>.</p>
-    <p><strong>Android:</strong> tap <strong>Print / Save as PDF</strong>, then set the
-    destination to <strong>Save as PDF</strong> and tap save.</p>
-    <p>On a computer the same button opens the normal print dialog, where the destination
-    can be a printer or a PDF.</p>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getFirestore, doc, onSnapshot, setDoc, deleteField }
@@ -207,7 +206,7 @@ const LABEL_BY_WEEKDAY = { 0: '2:00', 2: '1:15', 4: '1:15' };
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const STATUS_TEXT = { present: 'Present', absent: 'Absent', norecord: 'No record taken', upcoming: 'Scheduled' };
+const STATUS_TEXT = { present: 'Present', absent: 'Absent', norecord: 'No class scheduled', upcoming: 'Scheduled' };
 const STATUS_FILL = { present: 'var(--wc-blue)', absent: 'var(--absent)', norecord: 'var(--norecord)' };
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -231,8 +230,13 @@ function classDates() {
 }
 
 /**
- * A day nobody was marked on is "no record taken", NOT an absence for her —
+ * A day nobody was marked on is reported as "No class scheduled", never an absence —
  * the distinction matters on a document going to a registrar.
+ *
+ * CAVEAT: this is an inference, not a fact. All we know is that no student was marked.
+ * That reads as "no class was held" only while attendance is actually being taken for
+ * the classes that DO run; a held-but-unrecorded class lands in this same branch and
+ * would be reported to the college as though it never happened.
  */
 function statusFor(dateStr, row, today) {
   if (dateStr > today) return 'upcoming';
@@ -345,7 +349,7 @@ function render(attendance) {
     <div class="legend">
       <span><i class="sw" style="background:var(--wc-blue)"></i>Attended</span>
       <span><i class="sw" style="background:var(--absent)"></i>Absent</span>
-      <span><i class="sw" style="background:var(--norecord);border:1px solid var(--rule)"></i>No record taken</span>
+      <span><i class="sw" style="background:var(--norecord);border:1px solid var(--rule)"></i>No class scheduled</span>
       <span><i class="sw" style="border:1.5px dashed var(--muted);background:none"></i>Scheduled (not yet held)</span>
     </div>
     ${chartSVG(rows)}
@@ -386,7 +390,7 @@ function render(attendance) {
         <li>Class length is fixed by schedule: Tuesday 1:15, Thursday 1:15, Sunday 2:00.</li>
         <li>June: ${fmtHours(byMonth[0].hours)} across ${byMonth[0].classes} classes. July: ${fmtHours(byMonth[1].hours)} across ${byMonth[1].classes} classes.</li>
         ${upcoming.length ? `<li>${upcoming.length} classes remain scheduled through July 31 and are shown as pending. If ${STUDENT} attends all of them, her term total reaches ${fmtHours(potential)}.</li>` : ''}
-        ${norecord.length ? `<li>${norecord.length} scheduled ${norecord.length === 1 ? 'class' : 'classes'} (${norecord.map((r) => r.label).join(', ')}) ${norecord.length === 1 ? 'has' : 'have'} no attendance record for any student and ${norecord.length === 1 ? 'is' : 'are'} therefore not counted as an absence. Her total is a verified minimum.</li>` : ''}
+        ${norecord.length ? `<li>No class was held on ${norecord.length} ${norecord.length === 1 ? 'date' : 'dates'} in the regular Tuesday, Thursday and Sunday pattern (${norecord.map((r) => r.label).join(', ')}), so ${norecord.length === 1 ? 'it is' : 'they are'} not counted against her attendance.</li>` : ''}
         <li>Attendance is recorded live in the club's attendance system at each class.</li>
       </ul>
     </div>
