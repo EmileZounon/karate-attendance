@@ -126,7 +126,8 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
           </div>
 
           <p className="text-sm text-gray-600">
-            Paste the list of who attended (commas or one per line, e.g. from WhatsApp).
+            Paste the list of who attended (commas or one per line, e.g. from
+            WhatsApp). A single line of names split by spaces works too.
             They get marked present; everyone else on the roster is marked absent for this date.
           </p>
           <textarea

@@ -12,6 +12,13 @@ const MONTHS = new Set([
   'september', 'oct', 'october', 'nov', 'november', 'dec', 'december',
 ]);
 
+// Explicit separators the teacher typed on purpose: line breaks, commas,
+// semicolons. Their presence anywhere in the paste means boundaries are known.
+const EXPLICIT_SEPARATORS = /[\n,;]/;
+const SPLIT_ON_EXPLICIT = /[\n,;]+/;
+// Fallback for a single delimiter-free line like "angel ib emile".
+const SPLIT_ON_WHITESPACE = /\s+/;
+
 // Leading list markers: "1.", "2)", "-", "*", "•", "·" followed by space(s).
 const LEADING_MARKER = /^\s*(?:\d+[.)]|[-*•·])\s+/;
 // Trailing checkmarks / common emoji / stray punctuation + whitespace.
@@ -28,6 +35,22 @@ function looksLikeJunk(name) {
   return false;
 }
 
+// Decide how to cut a raw paste into tokens.
+//
+// Returns the RegExp to pass to String.split().
+//
+// The trade-off: a comma is the teacher saying "boundary here". A space is not,
+// which is why "Danny Thomas BU" must stay one name in a multi-line paste. But
+// when someone types "angel ib emile" as a single line with no separator at
+// all, the only sane reading is three students.
+//
+// A trailing comma/semicolon/newline is leftover punctuation, not a boundary
+// between two names, so ignore it when deciding.
+function chooseSplitter(rawText) {
+  const meaningful = rawText.replace(/[\s,;]+$/, '');
+  return EXPLICIT_SEPARATORS.test(meaningful) ? SPLIT_ON_EXPLICIT : SPLIT_ON_WHITESPACE;
+}
+
 export function parseNameList(rawText, existingStudents = []) {
   const existingByLower = new Map();
   for (const s of existingStudents) {
@@ -40,7 +63,8 @@ export function parseNameList(rawText, existingStudents = []) {
   const seenNew = new Set(); // lower-cased names already added this paste
   const seenDup = new Set(); // lower-cased duplicates already reported
 
-  const tokens = String(rawText || '').split(/[\n,;]+/);
+  const text = String(rawText || '');
+  const tokens = text.split(chooseSplitter(text));
 
   for (const token of tokens) {
     if (!token.trim()) continue; // drop empty lines silently
