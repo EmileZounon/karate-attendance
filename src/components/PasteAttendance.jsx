@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseNameList } from '../utils/nameListParser';
-import { buildAttendanceUpdate } from '../utils/attendanceUpdate';
+import { buildAttendanceUpdate, splitPastedNames } from '../utils/attendanceUpdate';
 import { generateDates, formatDate } from '../utils/dateUtils';
 import { countPresent } from '../utils/statistics';
 
@@ -117,6 +117,8 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
   const kept = keptPresentList(pastedPresent);
   const absent = absentList(pastedPresent);
   const presentCount = pastedPresent.size + kept.length;
+  // Of the pasted names, which ones this save actually changes.
+  const { fresh: pastedFresh, unchanged: pastedUnchanged } = splitPastedNames(attendance[date], present);
 
   return (
     <section className="dojo-card mb-4 p-4 no-print">
@@ -203,16 +205,22 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
 
           {preview && (
             <div className="space-y-4 border-t border-line2 pt-3">
-              {/* Present */}
+              {/* From your paste — split into who changes and who was already present */}
               <div>
                 <h3 className="font-semibold text-sm font-serif text-gi mb-1">
-                  Present ({present.length})
+                  From your paste ({present.length})
                 </h3>
-                {present.length > 0 ? (
-                  <p className="text-sm text-[#E8786C]">{present.join(', ')}</p>
-                ) : (
+                {present.length === 0 && (
                   <p className="text-sm text-gifaint">No pasted names matched the roster.</p>
                 )}
+                {pastedFresh.length > 0 && (
+                  <p className="text-sm text-[#E8786C]">{pastedFresh.join(', ')}</p>
+                )}
+                {pastedUnchanged.map((name) => (
+                  <p key={name} className="text-sm text-gidim">
+                    {name} <span className="text-gifaint">— already present, no change</span>
+                  </p>
+                ))}
               </div>
 
               {/* Already recorded present, left alone by a merge */}

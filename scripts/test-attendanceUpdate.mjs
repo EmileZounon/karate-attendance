@@ -1,6 +1,6 @@
 // Standalone test for the pure attendance-update builder.
 // Run: node scripts/test-attendanceUpdate.mjs
-import { buildAttendanceUpdate } from '../src/utils/attendanceUpdate.js';
+import { buildAttendanceUpdate, splitPastedNames } from '../src/utils/attendanceUpdate.js';
 
 let passed = 0;
 let failed = 0;
@@ -94,6 +94,23 @@ const roster = ['Ib', 'Angel', 'Varak', 'Paul', 'Julia', 'Ricardo', 'Cassiano'];
   const att = { '2026-06-21': { Cassiano: 1 } };
   buildAttendanceUpdate('2026-06-21', att, ['Ib'], roster);
   eq(att, { '2026-06-21': { Cassiano: 1 } }, 'input not mutated');
+}
+
+// 6. splitPastedNames tells apart who this paste actually changes.
+{
+  const day = { Cassiano: 1, Ib: 1, Angel: 0 };
+  eq(splitPastedNames(day, ['Cassiano']), { fresh: [], unchanged: ['Cassiano'] },
+    'a pasted name already present is unchanged');
+  eq(splitPastedNames(day, ['Angel']), { fresh: ['Angel'], unchanged: [] },
+    'a pasted name recorded absent is newly present');
+  eq(splitPastedNames(day, ['Paul']), { fresh: ['Paul'], unchanged: [] },
+    'a pasted name with no mark yet is newly present');
+  eq(splitPastedNames(day, ['Cassiano', 'Paul']), { fresh: ['Paul'], unchanged: ['Cassiano'] },
+    'a mixed paste splits both ways');
+  eq(splitPastedNames({}, ['Paul']), { fresh: ['Paul'], unchanged: [] },
+    'an empty day makes every pasted name newly present');
+  eq(splitPastedNames(undefined, ['Paul']), { fresh: ['Paul'], unchanged: [] },
+    'a missing day is treated as empty');
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);
