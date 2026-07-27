@@ -16,8 +16,10 @@ function defaultDate(dates) {
 }
 
 // Take attendance for a date by pasting the list of who showed up.
-// Matched names are marked present (1); everyone else on the roster is marked
-// absent (0). Unmatched names can be added to the roster + marked present.
+// Matched names are marked present (1). Anyone already marked for that date
+// keeps their mark, so a latecomer can be pasted on their own without
+// un-marking the students already recorded — unless "replace the whole day" is
+// ticked. Unmatched names can be added to the roster + marked present.
 export default function PasteAttendance({ students, attendance, updateBoth }) {
   const dates = useMemo(() => generateDates(), []);
   const [open, setOpen] = useState(false);
@@ -26,6 +28,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
   const [preview, setPreview] = useState(null); // { duplicates, newNames, skipped }
   const [checked, setChecked] = useState({}); // key -> bool (newNames by name, skipped by raw)
   const [showAbsent, setShowAbsent] = useState(false);
+  const [replaceDay, setReplaceDay] = useState(false);
   const [done, setDone] = useState(null);
 
   const existingPresent = countPresent(date, attendance);
@@ -59,11 +62,21 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     return out;
   };
 
-  // Roster students marked absent (present roster names removed).
-  const absentList = () => {
-    if (!preview) return [];
-    const present = new Set(preview.duplicates);
-    return students.filter((s) => !present.has(s));
+  // Students already recorded present for this date who aren't in the paste.
+  // Merge keeps them present; replace wipes them.
+  const keptPresentList = (pastedPresent) => {
+    if (replaceDay) return [];
+    const day = attendance[date] || {};
+    return students.filter((s) => !pastedPresent.has(s) && day[s] === 1);
+  };
+
+  // Roster students this save will mark absent. Under merge that excludes
+  // anyone already marked present — their 1 is left alone.
+  const absentList = (pastedPresent) => {
+    const day = attendance[date] || {};
+    return students.filter(
+      (s) => !pastedPresent.has(s) && (replaceDay || day[s] !== 1)
+    );
   };
 
   const save = () => {
@@ -72,28 +85,38 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     const presentNames = [...preview.duplicates, ...added];
     if (presentNames.length === 0) return;
     const newStudents = [...students, ...added];
-    const newAttendance = buildAttendanceUpdate(date, attendance, presentNames, newStudents);
+    const newAttendance = buildAttendanceUpdate(date, attendance, presentNames, newStudents, {
+      replace: replaceDay,
+    });
     updateBoth(newStudents, newAttendance);
+    // Report the day as it now stands, not just what was pasted.
+    const day = newAttendance[date];
+    const totalPresent = Object.values(day).filter((v) => v === 1).length;
+    const totalAbsent = Object.values(day).filter((v) => v === 0).length;
     setDone(
-      `Saved ${formatDate(date)}: ${presentNames.length} present, ${newStudents.length - presentNames.length} absent` +
+      `Saved ${formatDate(date)}: ${totalPresent} present, ${totalAbsent} absent` +
       (added.length ? `, ${added.length} new student${added.length > 1 ? 's' : ''} added.` : '.')
     );
     setText('');
     setPreview(null);
     setChecked({});
+    setReplaceDay(false);
   };
 
   const reset = () => {
     setText('');
     setPreview(null);
     setChecked({});
+    setReplaceDay(false);
     setDone(null);
   };
 
   const present = preview ? preview.duplicates : [];
   const added = addedNames();
-  const presentCount = present.length + added.length;
-  const absent = absentList();
+  const pastedPresent = new Set([...present, ...added]);
+  const kept = keptPresentList(pastedPresent);
+  const absent = absentList(pastedPresent);
+  const presentCount = pastedPresent.size + kept.length;
 
   return (
     <section className="dojo-card mb-4 p-4 no-print">
@@ -111,7 +134,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
             <label className="text-sm font-medium text-gidim">Class date:</label>
             <select
               value={date}
-              onChange={(e) => { setDate(e.target.value); setPreview(null); setDone(null); }}
+              onChange={(e) => { setDate(e.target.value); setPreview(null); setReplaceDay(false); setDone(null); }}
               className="flex-1 min-w-[8rem] sm:flex-none px-3 py-2.5 border border-line2 rounded-lg text-base sm:text-sm bg-sumi3 text-gi"
             >
               {dates.map((d) => (
@@ -119,8 +142,8 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               ))}
             </select>
             {dateHasData && (
-              <span className="text-xs text-gold bg-sumi3 border border-line2 rounded px-2 py-1">
-                ⚠ {formatDate(date)} already has {existingPresent} present recorded — saving replaces the whole day
+              <span className="text-xs text-indigosoft bg-sumi3 border border-line2 rounded px-2 py-1">
+                {formatDate(date)} already has {existingPresent} present recorded — they stay present
               </span>
             )}
           </div>
@@ -128,8 +151,27 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
           <p className="text-sm text-gidim">
             Paste the list of who attended (commas or one per line, e.g. from
             WhatsApp). A single line of names split by spaces works too.
-            They get marked present; everyone else on the roster is marked absent for this date.
+            They get marked present. {dateHasData
+              ? 'Anyone already recorded for this date keeps their mark, so you can paste a latecomer on their own.'
+              : 'Everyone else on the roster is marked absent for this date.'}
           </p>
+
+          {dateHasData && (
+            <label className="flex items-start gap-2 text-sm text-gidim">
+              <input
+                type="checkbox"
+                checked={replaceDay}
+                onChange={(e) => setReplaceDay(e.target.checked)}
+                className="h-5 w-5 rounded shrink-0 mt-0.5 accent-hinomaru"
+              />
+              <span>
+                Replace the whole day instead
+                <span className="block text-xs text-gold">
+                  ⚠ Wipes the {existingPresent} already recorded present. Only for fixing a wrong list.
+                </span>
+              </span>
+            </label>
+          )}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -172,6 +214,19 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                   <p className="text-sm text-gifaint">No pasted names matched the roster.</p>
                 )}
               </div>
+
+              {/* Already recorded present, left alone by a merge */}
+              {kept.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-sm font-serif text-gi mb-1">
+                    Already present, kept ({kept.length})
+                  </h3>
+                  <p className="text-xs text-gifaint mb-1">
+                    Recorded earlier for this date. This save leaves them present.
+                  </p>
+                  <p className="text-sm text-[#E8786C]">{kept.join(', ')}</p>
+                </div>
+              )}
 
               {/* Not on roster */}
               {preview.newNames.length > 0 && (
@@ -236,7 +291,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                 )}
               </div>
 
-              {presentCount > 0 && (
+              {pastedPresent.size > 0 && (
                 <button
                   onClick={save}
                   className="dojo-cta w-full sm:w-auto px-4 py-3 rounded transition-colors text-base font-medium"

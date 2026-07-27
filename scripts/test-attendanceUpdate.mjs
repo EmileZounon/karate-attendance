@@ -37,13 +37,46 @@ const roster = ['Ib', 'Angel', 'Varak', 'Paul', 'Julia', 'Ricardo', 'Cassiano'];
   eq(out['2026-06-21'].Angel, 0, 'new date Angel absent');
 }
 
-// 3. Overwriting a date with existing data fully replaces that day.
+// 3. Explicit replace wipes the day and rebuilds it from the pasted list.
 {
   const att = { '2026-06-21': { Cassiano: 1, Ib: 1, Angel: 1 } };
-  const out = buildAttendanceUpdate('2026-06-21', att, ['Paul'], roster);
+  const out = buildAttendanceUpdate('2026-06-21', att, ['Paul'], roster, { replace: true });
   eq(out['2026-06-21'], {
     Ib: 0, Angel: 0, Varak: 0, Paul: 1, Julia: 0, Ricardo: 0, Cassiano: 0,
-  }, 'overwrite replaces whole day (old present become 0)');
+  }, 'replace:true rebuilds whole day (old present become 0)');
+}
+
+// 3b. THE LATECOMER BUG: pasting again must not un-mark who was already present.
+{
+  const att = { '2026-06-21': { Cassiano: 1, Ib: 1, Angel: 1, Varak: 0 } };
+  const out = buildAttendanceUpdate('2026-06-21', att, ['Paul'], roster);
+  eq(out['2026-06-21'], {
+    Cassiano: 1, Ib: 1, Angel: 1, Varak: 0, Paul: 1, Julia: 0, Ricardo: 0,
+  }, 'default merge keeps earlier present marks, adds the latecomer');
+}
+
+// 3c. Merge preserves an explicit absent (0) already recorded for the day.
+{
+  const att = { '2026-06-21': { Ib: 1, Angel: 0 } };
+  const out = buildAttendanceUpdate('2026-06-21', att, ['Paul'], roster);
+  eq(out['2026-06-21'].Angel, 0, 'merge keeps an existing absent as absent');
+  eq(out['2026-06-21'].Ib, 1, 'merge keeps an existing present as present');
+}
+
+// 3d. On an empty day, merge behaves exactly like the old full-day record.
+{
+  const att = {};
+  const out = buildAttendanceUpdate('2026-06-21', att, ['Ib', 'Angel'], roster);
+  eq(out['2026-06-21'], {
+    Ib: 1, Angel: 1, Varak: 0, Paul: 0, Julia: 0, Ricardo: 0, Cassiano: 0,
+  }, 'merge on an empty day marks everyone else absent');
+}
+
+// 3e. A mark for someone no longer on the roster survives a merge.
+{
+  const att = { '2026-06-21': { Munawwar: 1 } };
+  const out = buildAttendanceUpdate('2026-06-21', att, ['Ib'], roster);
+  eq(out['2026-06-21'].Munawwar, 1, 'merge keeps marks for off-roster names');
 }
 
 // 4. A newly added student (in allStudents + presentNames) is marked present.
