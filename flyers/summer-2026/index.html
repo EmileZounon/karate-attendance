@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harvard Karate · Summer Series 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0C0D10;
+    --ink-2: #15171C;
+    --crimson: #A51C30;
+    --bone: #F3EEE5;
+    --muted: #8A8F9C;
+    --gold: #C8A24A;
+    --display: 'Bebas Neue', Impact, sans-serif;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Outfit', -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1080px; height: 1620px;
+    background: radial-gradient(120% 80% at 50% 0%, #1B1E26 0%, var(--ink) 55%, #08090B 100%);
+    color: var(--bone);
+    font-family: var(--sans);
+    display: flex; flex-direction: column;
+    padding: 70px 78px 76px;
+    position: relative; overflow: hidden;
+  }
+  /* soft crimson glow rising behind the title, no hard edges */
+  body::before {
+    content: ""; position: absolute; top: -520px; left: 50%;
+    width: 1400px; height: 1100px; transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(165,28,48,0.34), rgba(165,28,48,0.10) 58%, transparent 100%);
+    pointer-events: none;
+  }
+  header, main, footer { position: relative; z-index: 1; }
+
+  .eyebrow {
+    font-family: var(--sans); font-weight: 600; font-size: 17px;
+    letter-spacing: 7px; text-transform: uppercase; color: var(--gold);
+  }
+  h1 {
+    font-family: var(--display); font-size: 142px; line-height: 0.86;
+    letter-spacing: 2px; margin: 18px 0 0;
+  }
+  h1 .year { color: var(--crimson); }
+  .kicker {
+    font-family: var(--serif); font-style: italic; font-size: 30px;
+    color: #C6CBD6; margin-top: 20px;
+  }
+  .rule { height: 3px; background: linear-gradient(90deg, var(--crimson) 0%, var(--crimson) 34%, #2A2E38 34%); margin: 34px 0 0; }
+
+  .stats { display: flex; gap: 0; margin: 40px 0 6px; }
+  .stat { flex: 1; text-align: center; border-right: 1px solid #262A34; }
+  .stat:last-child { border-right: none; }
+  .stat b {
+    display: block; font-family: var(--display); font-size: 118px;
+    line-height: 0.9; color: var(--bone);
+  }
+  .stat.accent b { color: var(--crimson); }
+  .stat span {
+    display: block; font-size: 15px; letter-spacing: 5px;
+    text-transform: uppercase; color: var(--muted); margin-top: 12px; font-weight: 600;
+  }
+
+  main { flex: 1; display: flex; gap: 56px; margin-top: 42px; }
+  .col-title {
+    font-family: var(--sans); font-weight: 600; font-size: 15px; letter-spacing: 5px;
+    text-transform: uppercase; color: var(--gold); padding-bottom: 14px;
+    border-bottom: 1px solid #2A2E38; margin-bottom: 24px;
+  }
+  .kata { width: 42%; }
+  .kata ol { list-style: none; counter-reset: k; }
+  .kata li {
+    counter-increment: k; font-family: var(--display); font-size: 43px;
+    letter-spacing: 1.5px; line-height: 1.34; display: flex; align-items: baseline; gap: 16px;
+  }
+  .kata li::before {
+    content: counter(k, decimal-leading-zero);
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    color: var(--crimson); letter-spacing: 1px; min-width: 26px;
+  }
+  .extra {
+    margin-top: 24px; padding-top: 20px; border-top: 1px solid #2A2E38;
+    font-family: var(--serif); font-size: 24px; line-height: 1.55; color: #B9BFCB;
+  }
+  .extra em { color: var(--bone); font-style: normal; }
+
+  .roster { width: 58%; }
+  .tier { margin-bottom: 36px; }
+  .tier-head {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px;
+  }
+  .tier-head b {
+    font-family: var(--display); font-size: 34px; color: var(--crimson); letter-spacing: 1px;
+  }
+  .tier-head span {
+    font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); font-weight: 600;
+  }
+  .names { font-size: 28px; line-height: 1.45; color: var(--bone); font-weight: 300; }
+  .names .sep { color: #3E4450; padding: 0 8px; }
+  .tier.top .names { font-weight: 600; }
+
+  footer {
+    margin-top: 34px; padding-top: 26px; border-top: 1px solid #2A2E38;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .sig { font-family: var(--serif); font-size: 27px; color: #C6CBD6; }
+  .sig em { color: var(--bone); font-style: normal; }
+  .osu { font-family: var(--display); font-size: 46px; letter-spacing: 5px; color: var(--crimson); }
+</style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Harvard Karate</div>
+    <h1>Summer Series <span class="year">2026</span></h1>
+    <div class="kicker">One summer on the tatami. Nine kata. Nineteen students.</div>
+    <div class="rule"></div>
+    <div class="stats">
+      <div class="stat"><b>6</b><span>Classes</span></div>
+      <div class="stat"><b>19</b><span>Students</span></div>
+      <div class="stat accent"><b>9</b><span>Kata</span></div>
+      <div class="stat"><b>47</b><span>Check-ins</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="kata">
+      <div class="col-title">Kata Reviewed</div>
+      <ol>
+        <li>Heian Shodan</li>
+        <li>Heian Nidan</li>
+        <li>Heian Sandan</li>
+        <li>Heian Yondan</li>
+        <li>Heian Godan</li>
+        <li>Tekki Shodan</li>
+        <li>Bassai Dai</li>
+        <li>Jion</li>
+        <li>Empi</li>
+      </ol>
+      <div class="extra">
+        Also drilled: <em>kihon for the JUKF shodan test</em>, kihon for kyu promotion, and <em>kumite for white belts</em>.
+      </div>
+    </section>
+
+    <section class="roster">
+      <div class="col-title">Who Showed Up</div>
+
+      <div class="tier top">
+        <div class="tier-head"><b>5 of 6</b><span>Perfect but one</span></div>
+        <div class="names">Julia S.</div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><b>4 of 6</b></div>
+        <div class="names">Sevara<span class="sep">·</span>Rose<span class="sep">·</span>Varak</div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><b>3 of 6</b></div>
+        <div class="names">Emile<span class="sep">·</span>Anelise<span class="sep">·</span>Matheus<span class="sep">·</span>Sage<span class="sep">·</span>Munawwar</div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><b>2 of 6</b></div>
+        <div class="names">Fides<span class="sep">·</span>IB<span class="sep">·</span>Ewa<span class="sep">·</span>Angel<span class="sep">·</span>Peiqi</div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><b>1 of 6</b></div>
+        <div class="names">Aidan<span class="sep">·</span>Paul<span class="sep">·</span>Marcela<span class="sep">·</span>Myriam<span class="sep">·</span>LK</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="sig">Classes led by <em>Cassiano</em><br>Final session: August 20, 2026</div>
+    <div class="osu">OSU</div>
+  </footer>
+</body>
+</html>
