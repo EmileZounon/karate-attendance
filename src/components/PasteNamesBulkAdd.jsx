@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { parseNameList } from '../utils/nameListParser';
+import { initialResolutions, applyResolutions } from '../utils/nameSimilarity';
+import DidYouMean from './DidYouMean';
 
 // Bulk-add students by pasting a list (e.g. copied from WhatsApp).
 // Parses the text, lets the teacher review, then adds only the checked names.
@@ -7,8 +9,9 @@ import { parseNameList } from '../utils/nameListParser';
 export default function PasteNamesBulkAdd({ students, onAdd }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
-  const [preview, setPreview] = useState(null); // { newNames, duplicates, skipped }
+  const [preview, setPreview] = useState(null); // { newNames, duplicates, skipped, closeMatches }
   const [checked, setChecked] = useState({}); // name -> bool
+  const [resolutions, setResolutions] = useState({}); // closeMatch name -> roster name | NEW_STUDENT | null
   const [done, setDone] = useState(null); // success message
 
   const runPreview = () => {
@@ -20,7 +23,11 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
     result.newNames.forEach((n) => { init[n.name] = true; });
     result.skipped.forEach((s) => { init[s.raw] = false; });
     setChecked(init);
+    setResolutions(initialResolutions(result.closeMatches));
   };
+
+  const pick = (name, value) => setResolutions((r) => ({ ...r, [name]: value }));
+  const resolved = applyResolutions(preview ? preview.closeMatches : [], resolutions);
 
   const toggle = (key) => setChecked((c) => ({ ...c, [key]: !c[key] }));
 
@@ -36,10 +43,12 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
     };
     preview.newNames.forEach((n) => { if (checked[n.name]) take(n.name); });
     preview.skipped.forEach((s) => { if (checked[s.raw]) take(s.raw); });
+    resolved.added.forEach(take);
     return out;
   };
 
   const commit = () => {
+    if (resolved.unresolved.length > 0) return;
     const toAdd = selectedNames();
     if (toAdd.length === 0) return;
     onAdd(toAdd);
@@ -47,16 +56,20 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
     setText('');
     setPreview(null);
     setChecked({});
+    setResolutions({});
   };
 
   const reset = () => {
     setText('');
     setPreview(null);
     setChecked({});
+    setResolutions({});
     setDone(null);
   };
 
   const selectedCount = selectedNames().length;
+  // Already on the roster: exact matches plus "Did you mean?" picks.
+  const alreadyIn = preview ? [...preview.duplicates, ...resolved.present.filter((n) => !preview.duplicates.includes(n))] : [];
 
   return (
     <section className="dojo-card p-4">
@@ -126,9 +139,12 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                     ))}
                   </div>
                 </div>
-              ) : (
+              ) : preview.closeMatches.length === 0 && (
                 <p className="text-sm text-gifaint">No new names to add.</p>
               )}
+
+              {/* Close to an existing student: pick who was meant */}
+              <DidYouMean rows={preview.closeMatches} resolutions={resolutions} onPick={pick} idPrefix="add" />
 
               {/* Rescuable skipped lines */}
               {preview.skipped.length > 0 && (
@@ -156,21 +172,24 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               )}
 
               {/* Already on roster */}
-              {preview.duplicates.length > 0 && (
+              {alreadyIn.length > 0 && (
                 <div>
                   <h3 className="font-serif text-sm text-gi mb-1">
-                    Already in app ({preview.duplicates.length})
+                    Already in app ({alreadyIn.length})
                   </h3>
-                  <p className="text-sm text-gifaint">{preview.duplicates.join(', ')}</p>
+                  <p className="text-sm text-gifaint">{alreadyIn.join(', ')}</p>
                 </div>
               )}
 
-              {selectedCount > 0 && (
+              {(selectedCount > 0 || resolved.unresolved.length > 0) && (
                 <button
                   onClick={commit}
-                  className="dojo-cta w-full sm:w-auto px-4 py-3 text-base font-medium"
+                  disabled={resolved.unresolved.length > 0}
+                  className="dojo-cta w-full sm:w-auto px-4 py-3 text-base font-medium disabled:opacity-50"
                 >
-                  Add {selectedCount} student{selectedCount > 1 ? 's' : ''}
+                  {resolved.unresolved.length > 0
+                    ? 'Settle the "Did you mean?" choices to add'
+                    : `Add ${selectedCount} student${selectedCount > 1 ? 's' : ''}`}
                 </button>
               )}
             </div>

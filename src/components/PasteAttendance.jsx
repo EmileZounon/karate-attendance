@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { parseNameList } from '../utils/nameListParser';
 import { buildAttendanceUpdate, splitPastedNames } from '../utils/attendanceUpdate';
 import { generateDates, formatDate } from '../utils/dateUtils';
+import { initialResolutions, applyResolutions } from '../utils/nameSimilarity';
+import DidYouMean from './DidYouMean';
 import { countPresent } from '../utils/statistics';
 
 // Pick a sensible default class date: today if it's a class day, otherwise the
@@ -19,14 +21,17 @@ function defaultDate(dates) {
 // Matched names are marked present (1). Anyone already marked for that date
 // keeps their mark, so a latecomer can be pasted on their own without
 // un-marking the students already recorded — unless "replace the whole day" is
-// ticked. Unmatched names can be added to the roster + marked present.
+// ticked. Unmatched names can be added to the roster + marked present, except
+// that a spelling close to an existing student becomes a "Did you mean?" choice
+// instead of a silent new row.
 export default function PasteAttendance({ students, attendance, updateBoth }) {
   const dates = useMemo(() => generateDates(), []);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(() => defaultDate(dates));
   const [text, setText] = useState('');
-  const [preview, setPreview] = useState(null); // { duplicates, newNames, skipped }
+  const [preview, setPreview] = useState(null); // { duplicates, newNames, skipped, closeMatches }
   const [checked, setChecked] = useState({}); // key -> bool (newNames by name, skipped by raw)
+  const [resolutions, setResolutions] = useState({}); // closeMatch name -> roster name | NEW_STUDENT | null
   const [showAbsent, setShowAbsent] = useState(false);
   const [replaceDay, setReplaceDay] = useState(false);
   const [done, setDone] = useState(null);
@@ -42,7 +47,13 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     result.newNames.forEach((n) => { init[n.name] = true; });
     result.skipped.forEach((s) => { init[s.raw] = false; });
     setChecked(init);
+    setResolutions(initialResolutions(result.closeMatches));
   };
+
+  const pick = (name, value) => setResolutions((r) => ({ ...r, [name]: value }));
+
+  // What the "Did you mean?" choices amount to for this save.
+  const resolved = applyResolutions(preview ? preview.closeMatches : [], resolutions);
 
   const toggle = (key) => setChecked((c) => ({ ...c, [key]: !c[key] }));
 
@@ -59,6 +70,15 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     };
     preview.newNames.forEach((n) => { if (checked[n.name]) take(n.name); });
     preview.skipped.forEach((s) => { if (checked[s.raw]) take(s.raw); });
+    resolved.added.forEach(take);
+    return out;
+  };
+
+  // Pasted names that matched the roster, exactly or via a "Did you mean?" pick.
+  const matchedPresent = () => {
+    if (!preview) return [];
+    const out = [...preview.duplicates];
+    resolved.present.forEach((n) => { if (!out.includes(n)) out.push(n); });
     return out;
   };
 
@@ -80,9 +100,9 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
   };
 
   const save = () => {
-    if (!preview || !date) return;
+    if (!preview || !date || resolved.unresolved.length > 0) return;
     const added = addedNames();
-    const presentNames = [...preview.duplicates, ...added];
+    const presentNames = [...matchedPresent(), ...added];
     if (presentNames.length === 0) return;
     const newStudents = [...students, ...added];
     const newAttendance = buildAttendanceUpdate(date, attendance, presentNames, newStudents, {
@@ -100,6 +120,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     setText('');
     setPreview(null);
     setChecked({});
+    setResolutions({});
     setReplaceDay(false);
   };
 
@@ -107,11 +128,12 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     setText('');
     setPreview(null);
     setChecked({});
+    setResolutions({});
     setReplaceDay(false);
     setDone(null);
   };
 
-  const present = preview ? preview.duplicates : [];
+  const present = matchedPresent();
   const added = addedNames();
   const pastedPresent = new Set([...present, ...added]);
   const kept = keptPresentList(pastedPresent);
@@ -236,6 +258,9 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                 </div>
               )}
 
+              {/* Close to an existing student: pick who was meant */}
+              <DidYouMean rows={preview.closeMatches} resolutions={resolutions} onPick={pick} idPrefix="att" />
+
               {/* Not on roster */}
               {preview.newNames.length > 0 && (
                 <div>
@@ -299,12 +324,15 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                 )}
               </div>
 
-              {pastedPresent.size > 0 && (
+              {(pastedPresent.size > 0 || resolved.unresolved.length > 0) && (
                 <button
                   onClick={save}
-                  className="dojo-cta w-full sm:w-auto px-4 py-3 rounded transition-colors text-base font-medium"
+                  disabled={resolved.unresolved.length > 0}
+                  className="dojo-cta w-full sm:w-auto px-4 py-3 rounded transition-colors text-base font-medium disabled:opacity-50"
                 >
-                  Save attendance for {formatDate(date)} ({presentCount} present)
+                  {resolved.unresolved.length > 0
+                    ? 'Settle the "Did you mean?" choices to save'
+                    : `Save attendance for ${formatDate(date)} (${presentCount} present)`}
                 </button>
               )}
             </div>

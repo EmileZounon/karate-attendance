@@ -106,5 +106,36 @@ Danny Thomas BU`;
   eq(names(r), ['Danny Thomas BU'], 'leading comma still counts as explicit');
 }
 
+// 12. Near spellings of roster names are set aside as closeMatches, not newNames.
+{
+  const roster = ['Matteos', 'Sage', 'Julia G', 'Julia S', 'Fides (H)'];
+  const r = parseNameList('Matheus\nLior\nSage', roster);
+  eq(names(r), ['Lior'], 'a truly new name stays in newNames');
+  eq(r.duplicates, ['Sage'], 'exact match still lands in duplicates');
+  eq(r.closeMatches, [{ name: 'Matheus', raw: 'Matheus', candidates: ['Matteos'] }], 'near spelling carries its candidates');
+}
+
+// 13. Exact match wins over fuzzy: a correct spelling is never a "did you mean".
+{
+  const r = parseNameList('Matteos', ['Matteos', 'Matheus']);
+  eq(r.duplicates, ['Matteos'], 'exact spelling is a duplicate');
+  eq(r.closeMatches, [], 'no suggestion for an exact spelling');
+}
+
+// 14. An ambiguous name lists every candidate; the same typo twice is reported once.
+{
+  const r = parseNameList('Julia\njulia\nFides', ['Julia G', 'Julia S', 'Fides (H)']);
+  eq(r.closeMatches.map((c) => c.name), ['Julia', 'Fides'], 'in-paste duplicate collapsed');
+  eq(r.closeMatches[0].candidates, ['Julia G', 'Julia S'], 'both Julias offered');
+  eq(names(r), [], 'nothing left over as new');
+}
+
+// 15. Result always carries closeMatches (empty when the roster is empty).
+{
+  const r = parseNameList('Angel', []);
+  eq(r.closeMatches, [], 'closeMatches present and empty');
+  eq(names(r), ['Angel'], 'still a new name');
+}
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

@@ -1,10 +1,14 @@
 // Pure parser for turning a pasted block of text (e.g. a WhatsApp list) into
 // student names. No React, no DOM — easy to test in isolation.
 //
-// parseNameList(rawText, existingStudents) -> { newNames, duplicates, skipped }
-//   newNames   : [{ name, raw }]  names that look real and are not already on the roster
-//   duplicates : [string]         existing roster spelling for names already present
-//   skipped    : [{ raw }]        lines that do not look like names (dates, "class 19", ...)
+// parseNameList(rawText, existingStudents) -> { newNames, duplicates, skipped, closeMatches }
+//   newNames     : [{ name, raw }]              names that look real, not on the roster, and not close to anyone on it
+//   duplicates   : [string]                     existing roster spelling for names already present
+//   skipped      : [{ raw }]                    lines that do not look like names (dates, "class 19", ...)
+//   closeMatches : [{ name, raw, candidates }]  unknown spellings that are probably a typo of a roster name;
+//                                               candidates = roster names to offer as "Did you mean?"
+
+import { findCloseMatches } from './nameSimilarity.js';
 
 const MONTHS = new Set([
   'jan', 'january', 'feb', 'february', 'mar', 'march', 'apr', 'april',
@@ -60,7 +64,8 @@ export function parseNameList(rawText, existingStudents = []) {
   const newNames = [];
   const duplicates = [];
   const skipped = [];
-  const seenNew = new Set(); // lower-cased names already added this paste
+  const closeMatches = [];
+  const seenNew = new Set(); // lower-cased unknown names already handled this paste
   const seenDup = new Set(); // lower-cased duplicates already reported
 
   const text = String(rawText || '');
@@ -87,8 +92,15 @@ export function parseNameList(rawText, existingStudents = []) {
 
     if (seenNew.has(lower)) continue; // in-paste duplicate
     seenNew.add(lower);
+
+    // Not an exact match: is it a near miss of someone already on the roster?
+    const candidates = findCloseMatches(name, existingStudents);
+    if (candidates.length) {
+      closeMatches.push({ name, raw: token.trim(), candidates });
+      continue;
+    }
     newNames.push({ name, raw: token.trim() });
   }
 
-  return { newNames, duplicates, skipped };
+  return { newNames, duplicates, skipped, closeMatches };
 }
