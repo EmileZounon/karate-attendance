@@ -8,6 +8,13 @@ const EXTRA_DATES = [
 // Tuesday classes were added to the schedule starting this date (summer 2026).
 const TUESDAY_START = '2026-05-26';
 
+const MONTHS_EN = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const DAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_JA = ['日', '月', '火', '水', '木', '金', '土'];
+
 // Generate regular class dates for Jan–Dec 2026: Thursdays + Sundays all year,
 // plus Tuesdays from 2026-05-26 onward (summer), plus one-off extra practices.
 export const generateDates = () => {
@@ -31,22 +38,19 @@ export const generateDates = () => {
   return dates;
 };
 
-// Format date for display: "Thu 1/4" or "Sun 1/11"
-export const formatDate = (dateStr) => {
+// Format date for display. en: "Thu 3/9" (day/month). ja: "9/3（木）" (month/day,
+// the order Japanese readers expect). Unknown lang falls back to English.
+export const formatDate = (dateStr, lang = 'en') => {
   const d = new Date(dateStr + 'T12:00:00');
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const day = days[d.getDay()];
-  return `${day} ${d.getDate()}/${d.getMonth() + 1}`;
+  if (lang === 'ja') return `${d.getMonth() + 1}/${d.getDate()}（${DAYS_JA[d.getDay()]}）`;
+  return `${DAYS_EN[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`;
 };
 
-// Get month name from date string
-export const getMonth = (dateStr) => {
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+// Month name from date string. en: "September". ja: "9月".
+export const getMonth = (dateStr, lang = 'en') => {
   const monthIndex = parseInt(dateStr.split('-')[1]) - 1;
-  return months[monthIndex];
+  if (lang === 'ja') return `${monthIndex + 1}月`;
+  return MONTHS_EN[monthIndex];
 };
 
 // Get month key (e.g., "2026-01") from date string
@@ -58,12 +62,9 @@ export const getUniqueMonths = (dates) => {
   return monthKeys.sort();
 };
 
-// Get month label from month key (e.g., "2026-01" -> "January 2026")
-export const getMonthLabel = (monthKey) => {
+// Month label from month key. en: "2026-09" -> "September 2026". ja: "2026年9月".
+export const getMonthLabel = (monthKey, lang = 'en') => {
   const [year, month] = monthKey.split('-');
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  return `${months[parseInt(month) - 1]} ${year}`;
+  if (lang === 'ja') return `${year}年${parseInt(month)}月`;
+  return `${MONTHS_EN[parseInt(month) - 1]} ${year}`;
 };
