@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import LanguageToggle from './LanguageToggle';
+import { useLang } from '../i18n';
 
 const TEAM_PASSWORD = 'Cassiano';
 
-const ERROR_MESSAGES = [
-  'Keikoku. Try again.',
-  'Hansoku-Chui. Do 2 Sochin and Try again.',
-  'Hansoku. You are not among the descendants of Funakoshi and Tabata.',
-];
+const ERROR_KEYS = ['gate.error1', 'gate.error2', 'gate.error3'];
 
 const LOCKOUT_DURATIONS = [5 * 60000, 15 * 60000, 24 * 3600000]; // 5min, 15min, 24h
 
@@ -31,6 +29,7 @@ function formatCountdown(ms) {
 }
 
 export default function PasswordGate({ children }) {
+  const { t } = useLang();
   const [authorized, setAuthorized] = useState(() => {
     return localStorage.getItem('karate-auth') === TEAM_PASSWORD;
   });
@@ -107,7 +106,7 @@ export default function PasswordGate({ children }) {
           <p className="font-serif text-4xl text-hinomaru mb-4">道場</p>
           <p className="text-3xl mb-4">🥋</p>
           <p className="font-serif text-xl text-gi">
-            OOS. Enter in the Dojo.
+            {t('gate.entering')}
           </p>
         </div>
       </div>
@@ -121,14 +120,14 @@ export default function PasswordGate({ children }) {
         <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center">
           <p className="text-3xl mb-4">🚫</p>
           <p className="font-serif text-xl text-hinomaru mb-2">
-            Hansoku.
+            {t('gate.lockedTitle')}
           </p>
           <p className="text-gidim mb-4">
-            You are not among the descendants of Funakoshi and Tabata.
+            {t('gate.lockedBody')}
           </p>
           {remaining && (
             <p className="text-lg font-mono text-gi">
-              Try again in {remaining}
+              {t('gate.tryAgainIn', { time: remaining })}
             </p>
           )}
         </div>
@@ -137,26 +136,27 @@ export default function PasswordGate({ children }) {
   }
 
   const errorMessage = attempts > 0
-    ? ERROR_MESSAGES[Math.min(attempts - 1, ERROR_MESSAGES.length - 1)]
+    ? t(ERROR_KEYS[Math.min(attempts - 1, ERROR_KEYS.length - 1)])
     : null;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-sumi">
-      <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center">
+      <div className="dojo-card p-8 max-w-sm w-full mx-4 text-center relative">
+        <LanguageToggle className="absolute right-3 top-3" />
         <p className="font-serif text-4xl text-hinomaru mb-3">道場</p>
         <h1 className="font-serif text-2xl text-gi text-center mb-2">
-          Karate Black Belt Program
+          {t('app.titleShort')}
         </h1>
         <span className="dojo-brush mx-auto mb-4"></span>
         <p className="text-gifaint text-center mb-6">
-          Enter the team password to continue
+          {t('gate.prompt')}
         </p>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Team password"
+            placeholder={t('gate.placeholder')}
             className="w-full px-4 py-3 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg focus:outline-none focus:border-hinomaru text-center text-lg"
             autoFocus
           />
@@ -169,7 +169,7 @@ export default function PasswordGate({ children }) {
             type="submit"
             className="dojo-cta w-full mt-4 px-4 py-3 rounded-lg font-medium"
           >
-            Enter
+            {t('gate.enter')}
           </button>
         </form>
       </div>

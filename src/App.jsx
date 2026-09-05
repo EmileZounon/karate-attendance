@@ -9,17 +9,21 @@ import AnalyticsTab from './components/AnalyticsTab';
 import ChartsTab from './components/ChartsTab';
 import ManageStudentsTab from './components/ManageStudentsTab';
 import PasswordGate from './components/PasswordGate';
+import LanguageToggle from './components/LanguageToggle';
+import { useLang } from './i18n';
 
-const TABS = ['Today', 'Attendance', 'Dan Exam', 'Awards', 'Charts', 'Analytics', 'Manage Students'];
+// Stable keys; labels come from the dictionary (nav.<key>).
+const TABS = ['today', 'attendance', 'danExam', 'awards', 'charts', 'analytics', 'manage'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('Today');
+  const [activeTab, setActiveTab] = useState('today');
   const [data, setData, loading, error] = useFirestore({
     students: defaultStudents,
     attendance: defaultAttendance,
     savedAt: new Date().toISOString(),
   });
+  const { t, lang } = useLang();
 
   const updateStudents = (students) => {
     setData(prev => ({ ...prev, students, savedAt: new Date().toISOString() }));
@@ -55,15 +59,15 @@ export default function App() {
   const sortedStudents = allStudents;
 
   const savedTime = data.savedAt
-    ? new Date(data.savedAt).toLocaleString()
-    : 'Never';
+    ? new Date(data.savedAt).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')
+    : t('app.never');
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-hinomaru mx-auto mb-4"></div>
-          <p className="text-gidim">Loading attendance data...</p>
+          <p className="text-gidim">{t('app.loading')}</p>
         </div>
       </div>
     );
@@ -73,16 +77,17 @@ export default function App() {
     <PasswordGate>
     <div className="max-w-[1400px] mx-auto p-4">
       <header className="text-center mb-6 relative">
+        <LanguageToggle className="absolute right-0 top-0 no-print" />
         <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim mb-1">
           道場 · JKA
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-normal text-gi">
-          Karate Black Belt Program 2026
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal text-gi px-16">
+          {t('app.title')}
         </h1>
         <span className="dojo-brush mx-auto mt-3" />
         <p className="text-sm text-gifaint mt-3">
-          Last saved: {savedTime}
-          {error && <span className="text-hinomaru ml-2">(offline mode)</span>}
+          {t('app.lastSaved', { time: savedTime })}
+          {error && <span className="text-hinomaru ml-2">{t('app.offline')}</span>}
         </p>
       </header>
 
@@ -95,20 +100,20 @@ export default function App() {
               activeTab === tab ? 'tab-active' : 'tab-inactive'
             }`}
           >
-            {tab}
+            {t('nav.' + tab)}
           </button>
         ))}
       </nav>
 
       <main>
-        {activeTab === 'Today' && (
+        {activeTab === 'today' && (
           <TodayTab
             students={sortedStudents}
             attendance={data.attendance}
-            onTakeAttendance={() => setActiveTab('Attendance')}
+            onTakeAttendance={() => setActiveTab('attendance')}
           />
         )}
-        {activeTab === 'Attendance' && (
+        {activeTab === 'attendance' && (
           <AttendanceTab
             students={sortedStudents}
             attendance={data.attendance}
@@ -116,28 +121,28 @@ export default function App() {
             updateBoth={updateBoth}
           />
         )}
-        {activeTab === 'Dan Exam' && (
+        {activeTab === 'danExam' && (
           <GradingTab />
         )}
-        {activeTab === 'Awards' && (
+        {activeTab === 'awards' && (
           <AwardsTab
             students={sortedStudents.filter(s => !INSTRUCTORS.includes(s))}
             attendance={data.attendance}
           />
         )}
-        {activeTab === 'Analytics' && (
+        {activeTab === 'analytics' && (
           <AnalyticsTab
             students={sortedStudents}
             attendance={data.attendance}
           />
         )}
-        {activeTab === 'Charts' && (
+        {activeTab === 'charts' && (
           <ChartsTab
             students={sortedStudents}
             attendance={data.attendance}
           />
         )}
-        {activeTab === 'Manage Students' && (
+        {activeTab === 'manage' && (
           <ManageStudentsTab
             students={allStudents}
             attendance={data.attendance}
