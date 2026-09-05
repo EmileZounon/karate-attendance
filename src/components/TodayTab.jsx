@@ -5,9 +5,11 @@ import {
   calculateStreaks,
   calculateStudentStats,
 } from '../utils/statistics';
+import { useLang } from '../i18n';
 
 // "Today" home/landing screen — Dojo (Direction 01 · 道場) visual style.
 export default function TodayTab({ students = [], attendance = {}, onTakeAttendance }) {
+  const { t, lang } = useLang();
   const dates = useMemo(() => generateDates(), []);
 
   const snapshot = useMemo(
@@ -53,7 +55,7 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
   const moreRegulars = Math.max(0, regulars.length - 3);
 
   // Eyebrow weekday/date from nextClass.
-  const eyebrowDate = nextClass ? formatDate(nextClass) : '—';
+  const eyebrowDate = nextClass ? formatDate(nextClass, lang) : '—';
 
   return (
     <div className="max-w-md mx-auto px-1">
@@ -61,12 +63,12 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
       <div className="font-serif text-sm text-gidim flex items-baseline gap-2 mb-1 tracking-wide">
         <span className="text-hinomaru text-base">今日</span>
         <span>
-          {eyebrowDate} · Class {snapshot.classesHeld}
+          {t('today.eyebrow', { date: eyebrowDate, n: snapshot.classesHeld })}
         </span>
       </div>
 
       {/* 2 · Title */}
-      <h1 className="font-serif text-gi text-5xl leading-none mb-1">Today</h1>
+      <h1 className="font-serif text-gi text-5xl leading-none mb-1">{t('today.title')}</h1>
       <span className="dojo-brush mb-5" />
 
       {/* 3 · Primary CTA */}
@@ -76,8 +78,8 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
         className="dojo-cta w-full py-4 text-base mt-4 mb-4"
       >
         {nextClass
-          ? `Take attendance · ${formatDate(nextClass)}`
-          : 'Take attendance'}
+          ? t('today.takeFor', { date: formatDate(nextClass, lang) })
+          : t('today.take')}
       </button>
 
       {/* 4 · Last class recap */}
@@ -86,14 +88,14 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <div className="font-serif text-gi text-base">
-                Last class · {formatDate(lastClass)}
+                {t('today.lastClass', { date: formatDate(lastClass, lang) })}
               </div>
               <div className="text-gidim text-sm mt-0.5">
-                {snapshot.lastPresent} present
+                {t('today.present', { n: snapshot.lastPresent })}
                 {showStreak && (
                   <>
                     {' · '}
-                    {topStreaker.name}, {topStreaker.currentStreak} consecutive classes
+                    {t('today.streak', { name: topStreaker.name, n: topStreaker.currentStreak })}
                   </>
                 )}
               </div>
@@ -105,16 +107,16 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
         </div>
       ) : (
         <div className="dojo-card p-4 mb-3">
-          <div className="font-serif text-gi text-base">No classes recorded yet</div>
+          <div className="font-serif text-gi text-base">{t('today.noClasses')}</div>
           <div className="text-gidim text-sm mt-0.5">
-            Take your first attendance to start the record.
+            {t('today.noClassesHint')}
           </div>
         </div>
       )}
 
       {/* 5 · Expected today */}
       <div className="dojo-card p-4">
-        <div className="text-gidim text-sm mb-2">Expected today</div>
+        <div className="text-gidim text-sm mb-2">{t('today.expected')}</div>
         {hasData && firstThree.length > 0 ? (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-hinomaru text-white grid place-items-center font-bold flex-shrink-0">
@@ -125,13 +127,13 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
                 {firstThree.map((s) => s.name).join(' · ')}
               </div>
               {moreRegulars > 0 && (
-                <div className="text-gidim text-sm mt-0.5">and {moreRegulars} more regular attendees</div>
+                <div className="text-gidim text-sm mt-0.5">{t('today.moreRegulars', { n: moreRegulars })}</div>
               )}
             </div>
           </div>
         ) : (
           <div className="text-gidim text-sm">
-            No regular attendees yet. Record a few classes to populate this list.
+            {t('today.noRegulars')}
           </div>
         )}
       </div>
