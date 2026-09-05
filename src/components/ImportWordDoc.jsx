@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { parseWordDocument, mergeImportedData } from '../utils/wordParser';
+import { useLang } from '../i18n';
 
 export default function ImportWordDoc({ students, onImport }) {
+  const { t } = useLang();
   const [status, setStatus] = useState(null);
   const [importResult, setImportResult] = useState(null);
 
@@ -10,16 +12,16 @@ export default function ImportWordDoc({ students, onImport }) {
     if (!file) return;
 
     if (!file.name.endsWith('.docx')) {
-      setStatus({ type: 'error', message: 'Please upload a .docx file' });
+      setStatus({ type: 'error', message: t('word.needDocx') });
       return;
     }
 
     try {
-      setStatus({ type: 'loading', message: 'Parsing document...' });
+      setStatus({ type: 'loading', message: t('word.parsing') });
       const data = await parseWordDocument(file);
 
       if (data.students.length === 0) {
-        setStatus({ type: 'error', message: 'No student data found in document' });
+        setStatus({ type: 'error', message: t('word.noData') });
         return;
       }
 
@@ -34,30 +36,28 @@ export default function ImportWordDoc({ students, onImport }) {
 
       setStatus({
         type: 'success',
-        message: `Found ${data.students.length} students from ${data.month || 'unknown month'} ${data.year || ''}. ${
-          newStudents.length > 0
-            ? `New students: ${newStudents.join(', ')}`
-            : 'No new students to add.'
-        }`
+        message: `${t('word.found', { n: data.students.length, month: data.month || t('word.unknownMonth'), year: data.year || '' })} ${
+          newStudents.length > 0 ? t('word.newStudents', { names: newStudents.join(', ') }) : t('word.noNew')
+        }`,
       });
     } catch (error) {
-      setStatus({ type: 'error', message: 'Error parsing document: ' + error.message });
+      setStatus({ type: 'error', message: t('word.parseError', { error: error.message }) });
     }
   };
 
   const confirmImport = () => {
     if (importResult) {
       onImport(importResult.mergedStudents);
-      setStatus({ type: 'success', message: 'Students updated successfully!' });
+      setStatus({ type: 'success', message: t('word.updated') });
       setImportResult(null);
     }
   };
 
   return (
     <div className="p-4 border border-dashed border-line2 rounded-lg bg-sumi2">
-      <h3 className="font-serif font-bold mb-2 text-gi">Import from Word Document</h3>
+      <h3 className="font-serif font-bold mb-2 text-gi">{t('word.title')}</h3>
       <p className="text-sm text-gidim mb-3">
-        Upload an attendance report (.docx) to import student names and statistics.
+        {t('word.intro')}
       </p>
       <input
         type="file"
@@ -81,7 +81,7 @@ export default function ImportWordDoc({ students, onImport }) {
           onClick={confirmImport}
           className="mt-3 px-4 py-2 dojo-cta rounded transition-colors"
         >
-          Add {importResult.newStudents.length} New Student{importResult.newStudents.length > 1 ? 's' : ''}
+          {t(importResult.newStudents.length > 1 ? 'word.addNew.many' : 'word.addNew.one', { n: importResult.newStudents.length })}
         </button>
       )}
     </div>

@@ -6,6 +6,7 @@ import ImportWordDoc from './ImportWordDoc';
 import PasteNamesBulkAdd from './PasteNamesBulkAdd';
 import { formatDate, generateDates, getMonthKey, getMonthLabel } from '../utils/dateUtils';
 import { calculateStudentStats, calculateMonthlySummary, calculateStudentMonthly, getClassesHeld } from '../utils/statistics';
+import { useLang } from '../i18n';
 
 export default function ManageStudentsTab({
   students,
@@ -17,6 +18,7 @@ export default function ManageStudentsTab({
   importData,
   data,
 }) {
+  const { t, lang } = useLang();
   const [newName, setNewName] = useState('');
   const [editingName, setEditingName] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -38,9 +40,9 @@ export default function ManageStudentsTab({
 
   const restoreBackup = (backup) => {
     const { id, backupAt, timestamp, ...restoreData } = backup;
-    if (!confirm(`Restore backup from ${new Date(backupAt).toLocaleString()}? This will replace all current data.`)) return;
+    if (!confirm(t('manage.confirmRestore', { time: new Date(backupAt).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US') }))) return;
     importData(restoreData);
-    alert('Backup restored!');
+    alert(t('manage.restored'));
   };
 
   const startEdit = (name) => {
@@ -52,7 +54,7 @@ export default function ManageStudentsTab({
     const trimmed = editValue.trim();
     if (!trimmed || trimmed === editingName) { setEditingName(null); return; }
     if (students.includes(trimmed)) {
-      alert(`"${trimmed}" already exists.`);
+      alert(t('manage.exists', { name: trimmed }));
       return;
     }
     // Atomic update: rename in both students and attendance in one write
@@ -73,7 +75,7 @@ export default function ManageStudentsTab({
     const name = newName.trim();
     if (!name) return;
     if (students.includes(name)) {
-      alert(`"${name}" is already in the list.`);
+      alert(t('manage.inList', { name }));
       return;
     }
     updateStudents([...students, name]);
@@ -81,7 +83,7 @@ export default function ManageStudentsTab({
   };
 
   const removeStudent = (name) => {
-    if (!confirm(`Remove "${name}" and all their attendance records?`)) return;
+    if (!confirm(t('manage.confirmRemove', { name }))) return;
     // Atomic update: remove from both students and attendance in one write
     const newStudents = students.filter(s => s !== name);
     const newAtt = { ...attendance };
@@ -176,20 +178,20 @@ export default function ManageStudentsTab({
       try {
         const imported = JSON.parse(ev.target.result);
         if (!imported.students || !imported.attendance) {
-          alert('Invalid data format. Expected { students, attendance }.');
+          alert(t('manage.invalidJson'));
           return;
         }
         importData(imported);
-        alert('Data imported successfully!');
+        alert(t('manage.imported'));
       } catch {
-        alert('Error reading JSON file.');
+        alert(t('manage.jsonError'));
       }
     };
     reader.readAsText(file);
   };
 
   const handleReset = () => {
-    if (!confirm('Reset all data to defaults? This cannot be undone.')) return;
+    if (!confirm(t('manage.confirmReset'))) return;
     resetToDefaults();
   };
 
@@ -197,21 +199,21 @@ export default function ManageStudentsTab({
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Add Student */}
       <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Add Student</h2>
+        <h2 className="font-serif text-lg text-gi mb-3">{t('manage.addStudent')}</h2>
         <div className="flex gap-2">
           <input
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addStudent()}
-            placeholder="Student name"
+            placeholder={t('manage.namePlaceholder')}
             className="flex-1 px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg focus:outline-none focus:border-hinomaru"
           />
           <button
             onClick={addStudent}
             className="dojo-cta px-4 py-2"
           >
-            Add
+            {t('manage.add')}
           </button>
         </div>
       </section>
@@ -222,7 +224,7 @@ export default function ManageStudentsTab({
       {/* Student List */}
       <section className="dojo-card p-4">
         <h2 className="font-serif text-lg text-gi mb-3">
-          Current Students ({students.length})
+          {t('manage.current', { n: students.length })}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {students.map(name => (
@@ -236,14 +238,14 @@ export default function ManageStudentsTab({
                     onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditingName(null); }}
                     className="flex-1 px-2 py-1 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-sm focus:outline-none focus:border-hinomaru"
                   />
-                  <button onClick={saveEdit} className="text-indigosoft hover:text-gi text-sm font-medium">Save</button>
-                  <button onClick={() => setEditingName(null)} className="text-gifaint hover:text-gidim text-sm">Cancel</button>
+                  <button onClick={saveEdit} className="text-indigosoft hover:text-gi text-sm font-medium">{t('manage.save')}</button>
+                  <button onClick={() => setEditingName(null)} className="text-gifaint hover:text-gidim text-sm">{t('manage.cancel')}</button>
                 </>
               ) : (
                 <>
                   <span className="flex-1 font-medium text-gi">{name}</span>
-                  <button onClick={() => startEdit(name)} className="text-indigosoft hover:text-gi text-sm font-medium">Edit</button>
-                  <button onClick={() => removeStudent(name)} className="text-hinomaru hover:text-hinomarudeep text-sm font-medium">Remove</button>
+                  <button onClick={() => startEdit(name)} className="text-indigosoft hover:text-gi text-sm font-medium">{t('manage.edit')}</button>
+                  <button onClick={() => removeStudent(name)} className="text-hinomaru hover:text-hinomarudeep text-sm font-medium">{t('manage.remove')}</button>
                 </>
               )}
             </div>
@@ -258,29 +260,29 @@ export default function ManageStudentsTab({
 
       {/* Backup & Restore */}
       <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Backup & Restore</h2>
+        <h2 className="font-serif text-lg text-gi mb-3">{t('manage.backup')}</h2>
         <button
           onClick={loadBackups}
           disabled={loadingBackups}
           className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors disabled:opacity-50"
         >
-          {loadingBackups ? 'Loading...' : 'Load Backups'}
+          {loadingBackups ? t('manage.loading') : t('manage.loadBackups')}
         </button>
         {backups.length > 0 && (
           <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
             {backups.map(b => (
               <div key={b.id} className="flex items-center justify-between p-2 bg-sumi3 border border-line rounded-lg text-sm">
                 <div>
-                  <span className="font-medium text-gi">{new Date(b.backupAt).toLocaleString()}</span>
+                  <span className="font-medium text-gi">{new Date(b.backupAt).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</span>
                   <span className="text-gifaint ml-2">
-                    ({b.students?.length || 0} students, {Object.keys(b.attendance || {}).length} dates)
+                    {t('manage.backupMeta', { students: b.students?.length || 0, dates: Object.keys(b.attendance || {}).length })}
                   </span>
                 </div>
                 <button
                   onClick={() => restoreBackup(b)}
                   className="px-3 py-1 bg-indigoink text-gi rounded-lg text-xs hover:bg-indigosoft transition-colors"
                 >
-                  Restore
+                  {t('manage.restore')}
                 </button>
               </div>
             ))}
@@ -288,32 +290,32 @@ export default function ManageStudentsTab({
         )}
         {backups.length === 0 && !loadingBackups && (
           <p className="text-xs text-gifaint mt-2">
-            Auto-backups are created every 5 minutes when you make changes. Click above to check for available backups.
+            {t('manage.backupHint')}
           </p>
         )}
       </section>
 
       {/* Export / Import JSON */}
       <section className="dojo-card p-4">
-        <h2 className="font-serif text-lg text-gi mb-3">Data Management</h2>
+        <h2 className="font-serif text-lg text-gi mb-3">{t('manage.data')}</h2>
         <div className="space-y-3">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={exportExcel}
               className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors"
             >
-              Export as Excel
+              {t('manage.exportExcel')}
             </button>
             <button
               onClick={exportJSON}
               className="px-4 py-2 bg-indigoink text-gi rounded-lg hover:bg-indigosoft transition-colors"
             >
-              Export Data (JSON)
+              {t('manage.exportJson')}
             </button>
           </div>
           <div>
             <label className="block text-sm font-medium text-gidim mb-1">
-              Import Data (JSON)
+              {t('manage.importJson')}
             </label>
             <input
               type="file"
@@ -327,10 +329,10 @@ export default function ManageStudentsTab({
               onClick={handleReset}
               className="dojo-ghost px-4 py-2 text-hinomaru border-hinomaru"
             >
-              Reset to Defaults
+              {t('manage.reset')}
             </button>
             <p className="text-xs text-gifaint mt-1">
-              Restores original 16 students and January 2026 attendance data.
+              {t('manage.resetHint')}
             </p>
           </div>
         </div>
