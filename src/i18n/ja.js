@@ -58,7 +58,7 @@ export default {
   'paste.hide': '▲ 閉じる',
   'paste.show': '▼ 開く',
   'paste.classDate': '稽古日:',
-  'paste.alreadyRecorded': '{date} はすでに {n}名の出席が記録されています。そのまま残ります',
+  'paste.alreadyRecorded': '{date} はすでに {n}名の出席が記録されています。そのまま残ります。',
   'paste.intro': '出席した人のリストを貼り付けてください（カンマ区切りか1行に1名、WhatsAppからのコピーでも可）。スペース区切りの1行でも構いません。貼り付けた名前は出席になります。',
   'paste.introMerge': 'この日にすでに記録のある人はそのまま残るので、遅れて来た人だけを貼り付けることもできます。',
   'paste.introFresh': '名簿のそれ以外の人は、この日は欠席になります。',
@@ -67,7 +67,7 @@ export default {
   'paste.placeholder': 'IB, angel, varak, paul, julia, ricardo\n\nまたは1行に1名（WhatsAppから貼り付け）',
   'paste.preview': '確認',
   'paste.clear': 'クリア',
-  'paste.fromPaste': '貼り付けから（{n}）',
+  'paste.fromPaste': '貼り付けた名前（{n}）',
   'paste.noneMatched': '名簿と一致する名前がありませんでした。',
   'paste.alreadyPresentSuffix': 'すでに出席、変更なし',
   'paste.kept': 'すでに出席、そのまま（{n}）',
@@ -75,7 +75,7 @@ export default {
   'paste.notOnRoster': '名簿にいない名前（{n}）',
   'paste.notOnRosterHint': 'チェックすると名簿に追加され、この日の出席になります。',
   'paste.skipped': '名前ではないようです（{n}）',
-  'paste.skippedHint': '日付や回数などの行はスキップしました。実際は生徒名のものがあればチェックしてください。',
+  'paste.skippedHint': '日付や回数などの行はスキップしました。実際には生徒名だったものがあればチェックしてください。',
   'paste.absent': '欠席になる人（{n}）',
   'paste.none': 'なし',
   'paste.save': '{date} の出席を保存（出席 {n}名）',
@@ -90,7 +90,7 @@ export default {
   'dym.hint': '名簿にいる人と似たつづりなので、新しい生徒としては追加していません。どの人か選んでください。',
   'dym.open.one': '⚠ 選択が済んでいない名前が 1件あります。選ぶと保存できます。',
   'dym.open.many': '⚠ 選択が済んでいない名前が {n}件あります。選ぶと保存できます。',
-  'dym.youPasted': '貼り付けた名前:',
+  'dym.youPasted': '貼り付けた名前: 「{raw}」',
   'dym.addNew': 'いいえ、「{name}」を新しい生徒として追加',
 
   // Paste names (bulk add)
@@ -106,15 +106,15 @@ export default {
   'bulk.added.many': '生徒 {n}名を追加しました。',
 
   // Dan exam
-  'dan.eyebrow': '昇段 · 審査',
+  'dan.eyebrow': '昇段 · JKA',
   'dan.title': '昇段審査 2026',
   'dan.date': '2026年6月13日（土）',
   'dan.shodan.title': '初段',
-  'dan.shodan.label': '新初段',
+  'dan.shodan.label': '初段合格者',
   'dan.nidan.title': '弐段',
-  'dan.nidan.label': '新弐段',
+  'dan.nidan.label': '弐段合格者',
   'dan.instructors.title': 'JKA 指導員・審判員',
-  'dan.instructors.label': 'JKA 新規資格取得',
+  'dan.instructors.label': 'JKA 指導員・審判員 新規認定',
   'dan.congrats': '押忍 · 昇段された皆さん、おめでとうございます',
 
   // Awards

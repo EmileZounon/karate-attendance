@@ -10,7 +10,7 @@ const RANKS = [
 ];
 
 export default function GradingTab() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
     <div className="max-w-md mx-auto">
       <header className="mb-6">
@@ -27,7 +27,7 @@ export default function GradingTab() {
         return (
           <section key={rank.key} className="mb-6">
             <div className="flex items-baseline gap-2 mb-2">
-              <span className={`font-serif text-lg ${isGold ? 'text-gold' : 'text-indigosoft'}`}>{rank.kanji}</span>
+              {lang !== 'ja' && <span className={`font-serif text-lg ${isGold ? 'text-gold' : 'text-indigosoft'}`}>{rank.kanji}</span>}
               <h3 className="font-serif text-lg text-gi">{t(rank.titleKey)}</h3>
               <span className="text-xs text-gifaint ml-auto text-right">{t(rank.labelKey)}</span>
             </div>

@@ -55,7 +55,7 @@ export default function TodayTab({ students = [], attendance = {}, onTakeAttenda
   const moreRegulars = Math.max(0, regulars.length - 3);
 
   // Eyebrow weekday/date from nextClass.
-  const eyebrowDate = nextClass ? formatDate(nextClass, lang) : '—';
+  const eyebrowDate = nextClass ? formatDate(nextClass, lang) : '';
 
   return (
     <div className="max-w-md mx-auto px-1">

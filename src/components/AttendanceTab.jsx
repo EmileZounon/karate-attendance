@@ -72,7 +72,7 @@ export default function AttendanceTab({ students, attendance, updateAttendance, 
           <thead>
             <tr className="bg-sumi3 text-gidim">
               <th className="px-3 py-2 text-left font-serif sticky left-0 top-0 bg-sumi3 z-30">{t('att.date')}</th>
-              <th className="px-3 py-2 text-center font-bold font-serif sticky top-0 bg-sumi3 z-20">{t('att.total')}</th>
+              <th className="px-3 py-2 text-center font-bold font-serif sticky top-0 bg-sumi3 z-20 whitespace-nowrap">{t('att.total')}</th>
               {students.map(s => (
                 <th key={s} className="px-3 py-2 text-center whitespace-nowrap sticky top-0 bg-sumi3 z-20">{s}</th>
               ))}

@@ -38,7 +38,7 @@ export default function DidYouMean({ rows, resolutions, onPick, idPrefix = 'dym'
               className={`rounded-lg border px-3 pb-2 pt-1 ${pick == null ? 'border-gold' : 'border-line2'}`}
             >
               <legend className="px-1 text-sm text-gi">
-                {t('dym.youPasted')} <span className="font-semibold">“{r.raw}”</span>
+                {t('dym.youPasted', { raw: r.raw })}
               </legend>
               <div className="flex flex-wrap gap-x-5 gap-y-1">
                 {r.candidates.map((c) => (

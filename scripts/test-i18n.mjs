@@ -3,6 +3,7 @@
 import en from '../src/i18n/en.js';
 import ja from '../src/i18n/ja.js';
 import { makeT, interpolate, normalizeLang, LANGS, DEFAULT_LANG } from '../src/i18n/translate.js';
+import { readFileSync, readdirSync } from 'node:fs';
 
 let passed = 0;
 let failed = 0;
@@ -59,6 +60,27 @@ console.log('translate core:');
   const realJa = makeT('ja', { en, ja });
   eq(realJa('nav.today'), '今日', 'real dictionary: nav.today');
   eq(makeT('en', { en, ja })('nav.today'), 'Today', 'real dictionary: nav.today in English');
+}
+
+console.log('Keys used in components exist:');
+{
+  const files = ['../src/App.jsx', ...readdirSync(new URL('../src/components/', import.meta.url)).filter((f) => f.endsWith('.jsx')).map((f) => '../src/components/' + f)];
+  const used = new Set();
+  for (const f of files) {
+    const src = readFileSync(new URL(f, import.meta.url), 'utf8');
+    for (const m of src.matchAll(/t\('([a-zA-Z.]+)'/g)) used.add(m[1]);
+    for (const m of src.matchAll(/\? '([a-zA-Z.]+)' : '([a-zA-Z.]+)'/g)) { used.add(m[1]); used.add(m[2]); }
+    for (const m of src.matchAll(/'((?:gate|nav|dan)\.[a-zA-Z.]+)'/g)) used.add(m[1]);
+  }
+  // Real keys look like `section.name`. Drop scan artifacts: `t('nav.' + tab)`
+  // in App.jsx yields a bare `nav.` prefix (the seven nav.* keys are covered by
+  // the explicit check below), and `createElement('a')` in ManageStudentsTab.jsx
+  // trips the `t('` pattern via `Elemen` + `t(`.
+  for (const k of [...used]) if (!k.includes('.') || k.endsWith('.')) used.delete(k);
+  const missing = [...used].filter((k) => !(k in en));
+  eq(missing, [], 'every key referenced in a component exists in en.js');
+  eq(used.size > 100, true, 'the scan actually found keys');
+  eq(['today','attendance','danExam','awards','charts','analytics','manage'].filter((k) => !(('nav.' + k) in en)), [], 'every nav tab key has a nav.* label');
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);

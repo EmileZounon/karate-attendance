@@ -153,7 +153,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
         className="w-full flex items-center justify-between text-left"
       >
         <h2 className="text-lg font-bold font-serif text-gi">{t('paste.title')}</h2>
-        <span className="text-gifaint text-sm">{open ? t('paste.hide') : t('paste.show')}</span>
+        <span className="text-gifaint text-sm whitespace-nowrap shrink-0 ml-3">{open ? t('paste.hide') : t('paste.show')}</span>
       </button>
 
       {open && (

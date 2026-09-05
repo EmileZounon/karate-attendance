@@ -23,7 +23,7 @@ export default function AnalyticsTab({ students, attendance }) {
   const [activeSection, setActiveSection] = useState('');
 
   const monthlyLeaderboard = useMemo(() =>
-    monthlySummary.map(({ monthKey, month }) => {
+    monthlySummary.map(({ monthKey }) => {
       const ranked = studentMonthly
         .filter(s => !INSTRUCTORS.includes(s.name))
         .map(s => ({
@@ -36,7 +36,7 @@ export default function AnalyticsTab({ students, attendance }) {
         }))
         .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name))
         .slice(0, 3);
-      return { monthKey, month, ranked };
+      return { monthKey, ranked };
     }),
     [monthlySummary, studentMonthly]
   );

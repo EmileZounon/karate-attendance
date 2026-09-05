@@ -56,7 +56,7 @@ export default {
   'paste.hide': '▲ Hide',
   'paste.show': '▼ Show',
   'paste.classDate': 'Class date:',
-  'paste.alreadyRecorded': '{date} already has {n} present recorded, they stay present',
+  'paste.alreadyRecorded': '{date} already has {n} present recorded. They stay present.',
   'paste.intro': 'Paste the list of who attended (commas or one per line, e.g. from WhatsApp). A single line of names split by spaces works too. They get marked present.',
   'paste.introMerge': 'Anyone already recorded for this date keeps their mark, so you can paste a latecomer on their own.',
   'paste.introFresh': 'Everyone else on the roster is marked absent for this date.',
@@ -88,7 +88,7 @@ export default {
   'dym.hint': 'These spellings are close to someone already on the roster, so they were not added as new students. Pick who you meant.',
   'dym.open.one': '⚠ One spelling still needs a choice before you can save.',
   'dym.open.many': '⚠ {n} spellings still need a choice before you can save.',
-  'dym.youPasted': 'You pasted',
+  'dym.youPasted': 'You pasted “{raw}”',
   'dym.addNew': 'No, add “{name}” as a new student',
 
   // Paste names (bulk add)
