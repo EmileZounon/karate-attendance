@@ -89,7 +89,7 @@ export default {
   'dym.open.one': '⚠ One spelling still needs a choice before you can save.',
   'dym.open.many': '⚠ {n} spellings still need a choice before you can save.',
   'dym.youPasted': 'You pasted',
-  'dym.addNew': 'No, add "{name}" as a new student',
+  'dym.addNew': 'No, add “{name}” as a new student',
 
   // Paste names (bulk add)
   'bulk.title': 'Paste Names (bulk add)',
