@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { parseNameList } from '../utils/nameListParser';
 import { initialResolutions, applyResolutions } from '../utils/nameSimilarity';
 import DidYouMean from './DidYouMean';
+import { useLang } from '../i18n';
 
 // Bulk-add students by pasting a list (e.g. copied from WhatsApp).
 // Parses the text, lets the teacher review, then adds only the checked names.
 // `students` is the current roster; `onAdd(newNamesArray)` appends them.
 export default function PasteNamesBulkAdd({ students, onAdd }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [preview, setPreview] = useState(null); // { newNames, duplicates, skipped, closeMatches }
@@ -52,7 +54,7 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
     const toAdd = selectedNames();
     if (toAdd.length === 0) return;
     onAdd(toAdd);
-    setDone(`Added ${toAdd.length} student${toAdd.length > 1 ? 's' : ''}.`);
+    setDone(t(toAdd.length > 1 ? 'bulk.added.many' : 'bulk.added.one', { n: toAdd.length }));
     setText('');
     setPreview(null);
     setChecked({});
@@ -77,22 +79,20 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between text-left"
       >
-        <h2 className="text-lg font-serif text-gi">Paste Names (bulk add)</h2>
-        <span className="text-gifaint text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
+        <h2 className="text-lg font-serif text-gi">{t('bulk.title')}</h2>
+        <span className="text-gifaint text-sm">{open ? t('paste.hide') : t('paste.show')}</span>
       </button>
 
       {open && (
         <div className="mt-3 space-y-3">
           <p className="text-sm text-gidim">
-            Paste a list of names, one per line or separated by commas. Forgot
-            the commas? A single line like "angel ib emile" works too. The app
-            adds only the new ones and skips anyone already on the roster.
+            {t('bulk.intro')}
           </p>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={5}
-            placeholder={'IB, angel, varak, paul, julia, ricardo\n\nor one name per line, pasted from WhatsApp'}
+            placeholder={t('paste.placeholder')}
             className="w-full px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-base focus:outline-none focus:border-hinomaru"
           />
           <div className="flex flex-col sm:flex-row gap-2">
@@ -101,14 +101,14 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               disabled={!text.trim()}
               className="dojo-cta w-full sm:w-auto px-4 py-2.5 disabled:opacity-50"
             >
-              Preview
+              {t('paste.preview')}
             </button>
             {(preview || text) && (
               <button
                 onClick={reset}
                 className="dojo-ghost w-full sm:w-auto px-4 py-2.5"
               >
-                Clear
+                {t('paste.clear')}
               </button>
             )}
           </div>
@@ -123,7 +123,7 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               {preview.newNames.length > 0 ? (
                 <div>
                   <h3 className="font-serif text-sm text-gi mb-2">
-                    New names ({preview.newNames.length})
+                    {t('bulk.newNames', { n: preview.newNames.length })}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {preview.newNames.map((n) => (
@@ -140,7 +140,7 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                   </div>
                 </div>
               ) : preview.closeMatches.length === 0 && (
-                <p className="text-sm text-gifaint">No new names to add.</p>
+                <p className="text-sm text-gifaint">{t('bulk.noNew')}</p>
               )}
 
               {/* Close to an existing student: pick who was meant */}
@@ -150,10 +150,10 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               {preview.skipped.length > 0 && (
                 <div>
                   <h3 className="font-serif text-sm text-gi mb-1">
-                    Doesn&apos;t look like a name ({preview.skipped.length})
+                    {t('paste.skipped', { n: preview.skipped.length })}
                   </h3>
                   <p className="text-xs text-gifaint mb-2">
-                    Skipped (dates, class lines, etc). Tick any that are actually a student.
+                    {t('paste.skippedHint')}
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     {preview.skipped.map((s) => (
@@ -175,7 +175,7 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
               {alreadyIn.length > 0 && (
                 <div>
                   <h3 className="font-serif text-sm text-gi mb-1">
-                    Already in app ({alreadyIn.length})
+                    {t('bulk.alreadyIn', { n: alreadyIn.length })}
                   </h3>
                   <p className="text-sm text-gifaint">{alreadyIn.join(', ')}</p>
                 </div>
@@ -188,8 +188,8 @@ export default function PasteNamesBulkAdd({ students, onAdd }) {
                   className="dojo-cta w-full sm:w-auto px-4 py-3 text-base font-medium disabled:opacity-50"
                 >
                   {resolved.unresolved.length > 0
-                    ? 'Settle the "Did you mean?" choices to add'
-                    : `Add ${selectedCount} student${selectedCount > 1 ? 's' : ''}`}
+                    ? t('bulk.settleFirst')
+                    : t(selectedCount > 1 ? 'bulk.add.many' : 'bulk.add.one', { n: selectedCount })}
                 </button>
               )}
             </div>

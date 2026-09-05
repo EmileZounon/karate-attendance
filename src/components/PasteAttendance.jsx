@@ -5,6 +5,7 @@ import { generateDates, formatDate } from '../utils/dateUtils';
 import { initialResolutions, applyResolutions } from '../utils/nameSimilarity';
 import DidYouMean from './DidYouMean';
 import { countPresent } from '../utils/statistics';
+import { useLang } from '../i18n';
 
 // Pick a sensible default class date: today if it's a class day, otherwise the
 // most recent past class date, otherwise the first date.
@@ -25,6 +26,7 @@ function defaultDate(dates) {
 // that a spelling close to an existing student becomes a "Did you mean?" choice
 // instead of a silent new row.
 export default function PasteAttendance({ students, attendance, updateBoth }) {
+  const { t, lang } = useLang();
   const dates = useMemo(() => generateDates(), []);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState(() => defaultDate(dates));
@@ -114,8 +116,10 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
     const totalPresent = Object.values(day).filter((v) => v === 1).length;
     const totalAbsent = Object.values(day).filter((v) => v === 0).length;
     setDone(
-      `Saved ${formatDate(date)}: ${totalPresent} present, ${totalAbsent} absent` +
-      (added.length ? `, ${added.length} new student${added.length > 1 ? 's' : ''} added.` : '.')
+      t('paste.saved', { date: formatDate(date, lang), present: totalPresent, absent: totalAbsent }) +
+      (added.length
+        ? t(added.length > 1 ? 'paste.savedAdded.many' : 'paste.savedAdded.one', { n: added.length })
+        : t('paste.savedEnd'))
     );
     setText('');
     setPreview(null);
@@ -148,36 +152,32 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between text-left"
       >
-        <h2 className="text-lg font-bold font-serif text-gi">Take attendance (paste who showed up)</h2>
-        <span className="text-gifaint text-sm">{open ? '▲ Hide' : '▼ Show'}</span>
+        <h2 className="text-lg font-bold font-serif text-gi">{t('paste.title')}</h2>
+        <span className="text-gifaint text-sm">{open ? t('paste.hide') : t('paste.show')}</span>
       </button>
 
       {open && (
         <div className="mt-3 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <label className="text-sm font-medium text-gidim">Class date:</label>
+            <label className="text-sm font-medium text-gidim">{t('paste.classDate')}</label>
             <select
               value={date}
               onChange={(e) => { setDate(e.target.value); setPreview(null); setReplaceDay(false); setDone(null); }}
               className="flex-1 min-w-[8rem] sm:flex-none px-3 py-2.5 border border-line2 rounded-lg text-base sm:text-sm bg-sumi3 text-gi"
             >
               {dates.map((d) => (
-                <option key={d} value={d}>{formatDate(d)}</option>
+                <option key={d} value={d}>{formatDate(d, lang)}</option>
               ))}
             </select>
             {dateHasData && (
               <span className="text-xs text-indigosoft bg-sumi3 border border-line2 rounded px-2 py-1">
-                {formatDate(date)} already has {existingPresent} present recorded — they stay present
+                {t('paste.alreadyRecorded', { date: formatDate(date, lang), n: existingPresent })}
               </span>
             )}
           </div>
 
           <p className="text-sm text-gidim">
-            Paste the list of who attended (commas or one per line, e.g. from
-            WhatsApp). A single line of names split by spaces works too.
-            They get marked present. {dateHasData
-              ? 'Anyone already recorded for this date keeps their mark, so you can paste a latecomer on their own.'
-              : 'Everyone else on the roster is marked absent for this date.'}
+            {t('paste.intro')} {dateHasData ? t('paste.introMerge') : t('paste.introFresh')}
           </p>
 
           {dateHasData && (
@@ -189,9 +189,9 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                 className="h-5 w-5 rounded shrink-0 mt-0.5 accent-hinomaru"
               />
               <span>
-                Replace the whole day instead
+                {t('paste.replaceDay')}
                 <span className="block text-xs text-gold">
-                  ⚠ Wipes the {existingPresent} already recorded present. Only for fixing a wrong list.
+                  {t('paste.replaceWarn', { n: existingPresent })}
                 </span>
               </span>
             </label>
@@ -200,7 +200,7 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={5}
-            placeholder={'IB, angel, varak, paul, julia, ricardo\n\nor one name per line, pasted from WhatsApp'}
+            placeholder={t('paste.placeholder')}
             className="w-full px-3 py-2 bg-sumi3 border border-line2 text-gi placeholder-gifaint rounded-lg text-base focus:outline-none focus:border-hinomaru"
           />
           <div className="flex flex-col sm:flex-row gap-2">
@@ -209,14 +209,14 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               disabled={!text.trim() || !date}
               className="dojo-cta w-full sm:w-auto px-4 py-2.5 rounded transition-colors disabled:opacity-50"
             >
-              Preview
+              {t('paste.preview')}
             </button>
             {(preview || text) && (
               <button
                 onClick={reset}
                 className="dojo-ghost w-full sm:w-auto px-4 py-2.5 rounded transition-colors"
               >
-                Clear
+                {t('paste.clear')}
               </button>
             )}
           </div>
@@ -230,17 +230,17 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               {/* From your paste — split into who changes and who was already present */}
               <div>
                 <h3 className="font-semibold text-sm font-serif text-gi mb-1">
-                  From your paste ({present.length})
+                  {t('paste.fromPaste', { n: present.length })}
                 </h3>
                 {present.length === 0 && (
-                  <p className="text-sm text-gifaint">No pasted names matched the roster.</p>
+                  <p className="text-sm text-gifaint">{t('paste.noneMatched')}</p>
                 )}
                 {pastedFresh.length > 0 && (
                   <p className="text-sm text-[#E8786C]">{pastedFresh.join(', ')}</p>
                 )}
                 {pastedUnchanged.map((name) => (
                   <p key={name} className="text-sm text-gidim">
-                    {name} <span className="text-gifaint">— already present, no change</span>
+                    {name} <span className="text-gifaint">· {t('paste.alreadyPresentSuffix')}</span>
                   </p>
                 ))}
               </div>
@@ -249,10 +249,10 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               {kept.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-sm font-serif text-gi mb-1">
-                    Already present, kept ({kept.length})
+                    {t('paste.kept', { n: kept.length })}
                   </h3>
                   <p className="text-xs text-gifaint mb-1">
-                    Recorded earlier for this date. This save leaves them present.
+                    {t('paste.keptHint')}
                   </p>
                   <p className="text-sm text-[#E8786C]">{kept.join(', ')}</p>
                 </div>
@@ -265,10 +265,10 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               {preview.newNames.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-sm font-serif text-gi mb-1">
-                    Not on roster ({preview.newNames.length})
+                    {t('paste.notOnRoster', { n: preview.newNames.length })}
                   </h3>
                   <p className="text-xs text-gifaint mb-2">
-                    Tick to add them to the roster and mark present for this date.
+                    {t('paste.notOnRosterHint')}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                     {preview.newNames.map((n) => (
@@ -290,10 +290,10 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
               {preview.skipped.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-sm font-serif text-gi mb-1">
-                    Doesn&apos;t look like a name ({preview.skipped.length})
+                    {t('paste.skipped', { n: preview.skipped.length })}
                   </h3>
                   <p className="text-xs text-gifaint mb-2">
-                    Skipped (dates, class lines, etc). Tick any that are actually a student.
+                    {t('paste.skippedHint')}
                   </p>
                   <div className="grid grid-cols-1 gap-1">
                     {preview.skipped.map((s) => (
@@ -317,10 +317,10 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                   onClick={() => setShowAbsent((v) => !v)}
                   className="font-semibold text-sm font-serif text-gi"
                 >
-                  Will be marked absent ({absent.length}) {showAbsent ? '▲' : '▸'}
+                  {t('paste.absent', { n: absent.length })} {showAbsent ? '▲' : '▸'}
                 </button>
                 {showAbsent && (
-                  <p className="text-sm text-gidim mt-1">{absent.join(', ') || 'None'}</p>
+                  <p className="text-sm text-gidim mt-1">{absent.join(', ') || t('paste.none')}</p>
                 )}
               </div>
 
@@ -331,8 +331,8 @@ export default function PasteAttendance({ students, attendance, updateBoth }) {
                   className="dojo-cta w-full sm:w-auto px-4 py-3 rounded transition-colors text-base font-medium disabled:opacity-50"
                 >
                   {resolved.unresolved.length > 0
-                    ? 'Settle the "Did you mean?" choices to save'
-                    : `Save attendance for ${formatDate(date)} (${presentCount} present)`}
+                    ? t('paste.settleFirst')
+                    : t('paste.save', { date: formatDate(date, lang), n: presentCount })}
                 </button>
               )}
             </div>
