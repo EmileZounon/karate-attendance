@@ -8,11 +8,11 @@ const EXTRA_DATES = [
 // Tuesday classes were added to the schedule starting this date (summer 2026).
 const TUESDAY_START = '2026-05-26';
 
-// Generate regular class dates for Jan–Aug 2026: Thursdays + Sundays all year,
+// Generate regular class dates for Jan–Dec 2026: Thursdays + Sundays all year,
 // plus Tuesdays from 2026-05-26 onward (summer), plus one-off extra practices.
 export const generateDates = () => {
   const dates = [];
-  for (let month = 0; month <= 7; month++) {
+  for (let month = 0; month <= 11; month++) {
     for (let day = 1; day <= 31; day++) {
       const d = new Date(2026, month, day);
       if (d.getMonth() !== month) break;
