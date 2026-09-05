@@ -1,20 +1,22 @@
-import { GRADING_DATE, grading2026 } from '../data/grading2026';
+import { grading2026 } from '../data/grading2026';
+import { useLang } from '../i18n';
 
 // Highest celebration first: the new black belts, then the new licensed
 // instructors. Each rank carries its kanji and a short plain-English label.
 const RANKS = [
-  { key: 'shodan',      kanji: '初段',   title: 'Shodan',                   label: 'New 1st-degree black belts', accent: 'gold' },
-  { key: 'nidan',       kanji: '弐段',   title: 'Nidan',                    label: 'New 2nd-degree black belts', accent: 'gold' },
-  { key: 'instructors', kanji: '指導員', title: 'JKA instructors & judges', label: 'Newly licensed by the JKA',  accent: 'indigo' },
+  { key: 'shodan',      kanji: '初段',   titleKey: 'dan.shodan.title',      labelKey: 'dan.shodan.label',      accent: 'gold' },
+  { key: 'nidan',       kanji: '弐段',   titleKey: 'dan.nidan.title',       labelKey: 'dan.nidan.label',       accent: 'gold' },
+  { key: 'instructors', kanji: '指導員', titleKey: 'dan.instructors.title', labelKey: 'dan.instructors.label', accent: 'indigo' },
 ];
 
 export default function GradingTab() {
+  const { t } = useLang();
   return (
     <div className="max-w-md mx-auto">
       <header className="mb-6">
-        <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim">昇段 · Dan Exam</div>
-        <h2 className="font-serif text-2xl text-gi mt-1">Dan Exam 2026</h2>
-        <p className="text-sm text-gidim mt-0.5">JKA · {GRADING_DATE}</p>
+        <div className="font-serif text-xs tracking-[0.16em] uppercase text-gidim">{t('dan.eyebrow')}</div>
+        <h2 className="font-serif text-2xl text-gi mt-1">{t('dan.title')}</h2>
+        <p className="text-sm text-gidim mt-0.5">JKA · {t('dan.date')}</p>
         <span className="dojo-brush mt-3" />
       </header>
 
@@ -26,8 +28,8 @@ export default function GradingTab() {
           <section key={rank.key} className="mb-6">
             <div className="flex items-baseline gap-2 mb-2">
               <span className={`font-serif text-lg ${isGold ? 'text-gold' : 'text-indigosoft'}`}>{rank.kanji}</span>
-              <h3 className="font-serif text-lg text-gi">{rank.title}</h3>
-              <span className="text-xs text-gifaint ml-auto text-right">{rank.label}</span>
+              <h3 className="font-serif text-lg text-gi">{t(rank.titleKey)}</h3>
+              <span className="text-xs text-gifaint ml-auto text-right">{t(rank.labelKey)}</span>
             </div>
             <div className="dojo-card divide-y divide-line">
               {names.map(name => {
@@ -49,7 +51,7 @@ export default function GradingTab() {
 
       <div className="text-center mt-8">
         <span className="dojo-brush mx-auto mb-3" />
-        <p className="text-sm text-gifaint">押忍 · Congratulations to every new grade</p>
+        <p className="text-sm text-gifaint">{t('dan.congrats')}</p>
       </div>
     </div>
   );
