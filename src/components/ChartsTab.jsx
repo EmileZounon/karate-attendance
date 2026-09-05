@@ -12,6 +12,7 @@ import {
   countPresent,
 } from '../utils/statistics';
 import { downloadPDF } from '../utils/pdfExport';
+import { useLang } from '../i18n';
 
 const COLORS = [
   '#D23B2C', '#3E5C82', '#C8A24B', '#A52E22', '#5A7BA6',
@@ -21,6 +22,7 @@ const COLORS = [
 ];
 
 export default function ChartsTab({ students, attendance }) {
+  const { t, lang } = useLang();
   const dates = useMemo(() => generateDates(), []);
   const studentStats = useMemo(() => calculateStudentStats(students, dates, attendance), [students, dates, attendance]);
   const monthlySummary = useMemo(() => calculateMonthlySummary(dates, attendance), [dates, attendance]);
@@ -30,17 +32,17 @@ export default function ChartsTab({ students, attendance }) {
 
   const classAttendanceData = useMemo(() =>
     classesHeld.map(date => ({
-      date: formatDate(date),
+      date: formatDate(date, lang),
       students: countPresent(date, attendance),
     })),
-    [classesHeld, attendance]
+    [classesHeld, attendance, lang]
   );
 
   const months = monthlySummary.map(m => m.monthKey);
   const monthlyStudentData = useMemo(() =>
     months.map(monthKey => ({
       monthKey,
-      label: getMonthLabel(monthKey),
+      label: getMonthLabel(monthKey, lang),
       data: students.map((student, i) => {
         const sm = studentMonthly.find(s => s.name === student);
         return {
@@ -50,17 +52,24 @@ export default function ChartsTab({ students, attendance }) {
         };
       }).sort((a, b) => b.attended - a.attended),
     })),
-    [months, students, studentMonthly]
+    [months, students, studentMonthly, lang]
+  );
+
+  // Month names for the monthly chart's x-axis follow the toggle. The summary
+  // itself keeps English labels for the Excel export.
+  const monthlySummaryLocal = useMemo(
+    () => monthlySummary.map((m) => ({ ...m, month: getMonthLabel(m.monthKey, lang) })),
+    [monthlySummary, lang]
   );
 
   const chartOptions = [
-    { id: 'total',         label: 'Total Attendance by Student' },
+    { id: 'total',         label: t('charts.total') },
     ...monthlyStudentData.map(({ monthKey, label }) => ({
       id: `month-${monthKey}`,
-      label: `${label} — By Student`,
+      label: t('charts.monthByStudent', { month: label }),
     })),
-    { id: 'monthly-total', label: 'Monthly Total Attendance' },
-    { id: 'per-class',     label: 'Students per Class Over Time' },
+    { id: 'monthly-total', label: t('charts.monthlyTotal') },
+    { id: 'per-class',     label: t('charts.perClass') },
   ];
 
   // ── Chart sections ───────────────────────────────────────────
@@ -68,7 +77,7 @@ export default function ChartsTab({ students, attendance }) {
   const charts = {
     total: (
       <section key="total">
-        <h2 className="text-xl font-serif font-bold text-gi mb-4">Total Attendance by Student</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">{t('charts.total')}</h2>
         <div className="h-64 sm:h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={studentStats} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -76,7 +85,7 @@ export default function ChartsTab({ students, attendance }) {
               <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="attended" name="Classes Attended">
+              <Bar dataKey="attended" name={t('charts.attended')}>
                 {studentStats.map((entry, index) => (
                   <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -90,7 +99,7 @@ export default function ChartsTab({ students, attendance }) {
       monthlyStudentData.map(({ monthKey, label, data }) => [
         `month-${monthKey}`,
         <section key={monthKey}>
-          <h2 className="text-xl font-serif font-bold text-gi mb-4">{label} — Attendance by Student</h2>
+          <h2 className="text-xl font-serif font-bold text-gi mb-4">{t('charts.monthByStudentTitle', { month: label })}</h2>
           <div className="h-64 sm:h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -98,7 +107,7 @@ export default function ChartsTab({ students, attendance }) {
                 <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="attended" name="Classes Attended">
+                <Bar dataKey="attended" name={t('charts.attended')}>
                   {data.map(entry => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
@@ -111,16 +120,16 @@ export default function ChartsTab({ students, attendance }) {
     ),
     'monthly-total': (
       <section key="monthly-total">
-        <h2 className="text-xl font-serif font-bold text-gi mb-4">Monthly Total Attendance</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">{t('charts.monthlyTotal')}</h2>
         <div className="h-56 sm:h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlySummary} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={monthlySummaryLocal} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="totalAttendance" name="Total Attendance" fill="#D23B2C" />
-              <Bar dataKey="classesHeld" name="Classes Held" fill="#3E5C82" />
+              <Bar dataKey="totalAttendance" name={t('charts.totalAttendance')} fill="#D23B2C" />
+              <Bar dataKey="classesHeld" name={t('charts.classesHeld')} fill="#3E5C82" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -128,7 +137,7 @@ export default function ChartsTab({ students, attendance }) {
     ),
     'per-class': (
       <section key="per-class">
-        <h2 className="text-xl font-serif font-bold text-gi mb-4">Students per Class Over Time</h2>
+        <h2 className="text-xl font-serif font-bold text-gi mb-4">{t('charts.perClass')}</h2>
         <div className="h-56 sm:h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={classAttendanceData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
@@ -142,7 +151,7 @@ export default function ChartsTab({ students, attendance }) {
                 stroke="#D23B2C"
                 strokeWidth={2}
                 dot={{ r: 5 }}
-                name="Students Present"
+                name={t('charts.studentsPresent')}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -160,7 +169,7 @@ export default function ChartsTab({ students, attendance }) {
             onChange={e => setActiveChart(e.target.value)}
             className="px-3 py-2 border border-line2 rounded-lg text-sm bg-sumi2 text-gi"
           >
-            <option value="">All charts</option>
+            <option value="">{t('charts.all')}</option>
             {chartOptions.map(c => (
               <option key={c.id} value={c.id}>{c.label}</option>
             ))}
@@ -170,7 +179,7 @@ export default function ChartsTab({ students, attendance }) {
           onClick={() => downloadPDF('charts-content', 'Karate_Charts_Report', 'landscape')}
           className="dojo-ghost px-4 py-2 rounded-lg transition-colors text-sm"
         >
-          Download Charts Report (PDF)
+          {t('charts.download')}
         </button>
       </div>
 

@@ -7,11 +7,13 @@ import {
   getPctClass,
 } from '../utils/statistics';
 import { downloadPDF } from '../utils/pdfExport';
+import { useLang } from '../i18n';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 const INSTRUCTORS = ['Vazrik', 'Cassiano'];
 
 export default function AnalyticsTab({ students, attendance }) {
+  const { t, lang } = useLang();
   const dates = useMemo(() => generateDates(), []);
   const studentStats = useMemo(() => calculateStudentStats(students, dates, attendance), [students, dates, attendance]);
   const monthlySummary = useMemo(() => calculateMonthlySummary(dates, attendance), [dates, attendance]);
@@ -52,11 +54,11 @@ export default function AnalyticsTab({ students, attendance }) {
     .sort((a, b) => b.attended - a.attended || a.name.localeCompare(b.name));
 
   const sectionOptions = [
-    { id: 'monthly-lb',      label: 'Monthly Leaderboards' },
-    { id: 'leaderboard',     label: 'Overall Leaderboard' },
-    { id: 'student-stats',   label: 'Student Statistics' },
-    { id: 'monthly-summary', label: 'Monthly Summary' },
-    { id: 'by-month',        label: 'Student Attendance by Month' },
+    { id: 'monthly-lb',      label: t('an.monthlyLb') },
+    { id: 'leaderboard',     label: t('an.overallLb') },
+    { id: 'student-stats',   label: t('an.studentStats') },
+    { id: 'monthly-summary', label: t('an.monthlySummary') },
+    { id: 'by-month',        label: t('an.byMonth') },
   ];
 
   const sectionLabel = sectionOptions.find(s => s.id === activeSection)?.label;
@@ -65,17 +67,17 @@ export default function AnalyticsTab({ students, attendance }) {
 
   const monthlyLeaderboardSection = (
     <section>
-      <h2 className="text-xl font-serif text-gi mb-4">Monthly Leaderboards</h2>
+      <h2 className="text-xl font-serif text-gi mb-4">{t('an.monthlyLb')}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {monthlyLeaderboard.map(({ monthKey, month, ranked }) => (
+        {monthlyLeaderboard.map(({ monthKey, ranked }) => (
           <div key={monthKey} className="dojo-card border border-line2 rounded-lg overflow-hidden">
-            <div className="bg-hinomaru text-gi px-4 py-2 font-serif">{month}</div>
+            <div className="bg-hinomaru text-gi px-4 py-2 font-serif">{getMonthLabel(monthKey, lang)}</div>
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-sumi3">
-                  <th className="px-4 py-2 text-left text-gidim">Rank</th>
-                  <th className="px-4 py-2 text-left text-gidim">Student</th>
-                  <th className="px-4 py-2 text-center text-gidim">Attended</th>
+                  <th className="px-4 py-2 text-left text-gidim">{t('an.rank')}</th>
+                  <th className="px-4 py-2 text-left text-gidim">{t('an.student')}</th>
+                  <th className="px-4 py-2 text-center text-gidim">{t('an.attended')}</th>
                   <th className="px-4 py-2 text-center text-gidim">%</th>
                 </tr>
               </thead>
@@ -100,15 +102,15 @@ export default function AnalyticsTab({ students, attendance }) {
 
   const leaderboardSection = (
     <section>
-      <h2 className="text-xl font-serif text-gi mb-3">Overall Leaderboard</h2>
+      <h2 className="text-xl font-serif text-gi mb-3">{t('an.overallLb')}</h2>
       <div className="overflow-x-auto dojo-card border border-line2 rounded-lg">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-sumi3">
-              <th className="px-4 py-2 text-left text-gidim min-w-[60px]">Rank</th>
-              <th className="px-4 py-2 text-left text-gidim min-w-[120px]">Student</th>
-              <th className="px-4 py-2 text-center text-gidim min-w-[130px]">Classes Attended</th>
-              <th className="px-4 py-2 text-center text-gidim min-w-[120px]">Attendance %</th>
+              <th className="px-4 py-2 text-left text-gidim min-w-[60px]">{t('an.rank')}</th>
+              <th className="px-4 py-2 text-left text-gidim min-w-[120px]">{t('an.student')}</th>
+              <th className="px-4 py-2 text-center text-gidim min-w-[130px]">{t('an.classesAttended')}</th>
+              <th className="px-4 py-2 text-center text-gidim min-w-[120px]">{t('an.attendancePct')}</th>
             </tr>
           </thead>
           <tbody>
@@ -128,17 +130,17 @@ export default function AnalyticsTab({ students, attendance }) {
 
   const studentStatsSection = (
     <section>
-      <h2 className="text-xl font-serif text-gi mb-3">Student Statistics</h2>
+      <h2 className="text-xl font-serif text-gi mb-3">{t('an.studentStats')}</h2>
       <div className="overflow-x-auto dojo-card border border-line2 rounded-lg">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-sumi3">
-              <th className="px-4 py-2 text-left text-gidim">Rank</th>
-              <th className="px-4 py-2 text-left text-gidim">Student</th>
-              <th className="px-4 py-2 text-center text-gidim">Classes Attended</th>
-              <th className="px-4 py-2 text-center text-gidim">Classes Missed</th>
-              <th className="px-4 py-2 text-center text-gidim">Classes Held</th>
-              <th className="px-4 py-2 text-center text-gidim">Attendance %</th>
+              <th className="px-4 py-2 text-left text-gidim">{t('an.rank')}</th>
+              <th className="px-4 py-2 text-left text-gidim">{t('an.student')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.classesAttended')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.classesMissed')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.classesHeld')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.attendancePct')}</th>
             </tr>
           </thead>
           <tbody>
@@ -160,21 +162,21 @@ export default function AnalyticsTab({ students, attendance }) {
 
   const monthlySummarySection = (
     <section>
-      <h2 className="text-xl font-serif text-gi mb-3">Monthly Summary</h2>
+      <h2 className="text-xl font-serif text-gi mb-3">{t('an.monthlySummary')}</h2>
       <div className="overflow-x-auto dojo-card border border-line2 rounded-lg">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-sumi3">
-              <th className="px-4 py-2 text-left text-gidim">Month</th>
-              <th className="px-4 py-2 text-center text-gidim">Total Attendance</th>
-              <th className="px-4 py-2 text-center text-gidim">Classes Held</th>
-              <th className="px-4 py-2 text-center text-gidim">Avg per Class</th>
+              <th className="px-4 py-2 text-left text-gidim">{t('an.month')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.totalAttendance')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.classesHeld')}</th>
+              <th className="px-4 py-2 text-center text-gidim">{t('an.avgPerClass')}</th>
             </tr>
           </thead>
           <tbody>
             {monthlySummary.map((m, i) => (
               <tr key={m.monthKey} className={i % 2 === 0 ? 'bg-sumi2' : 'bg-sumi'}>
-                <td className="px-4 py-2 font-medium text-gi">{m.month}</td>
+                <td className="px-4 py-2 font-medium text-gi">{getMonthLabel(m.monthKey, lang)}</td>
                 <td className="px-4 py-2 text-center font-serif text-gi">{m.totalAttendance}</td>
                 <td className="px-4 py-2 text-center text-gidim">{m.classesHeld}</td>
                 <td className="px-4 py-2 text-center text-gidim">{m.avgPerClass}</td>
@@ -188,16 +190,16 @@ export default function AnalyticsTab({ students, attendance }) {
 
   const byMonthSection = (
     <section>
-      <h2 className="text-xl font-serif text-gi mb-3">Student Attendance by Month</h2>
+      <h2 className="text-xl font-serif text-gi mb-3">{t('an.byMonth')}</h2>
       <div className="overflow-x-auto dojo-card border border-line2 rounded-lg">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-sumi3">
-              <th className="px-4 py-2 text-left text-gidim">Student</th>
+              <th className="px-4 py-2 text-left text-gidim">{t('an.student')}</th>
               {months.map(m => (
-                <th key={m} className="px-4 py-2 text-center text-gidim">{getMonthLabel(m)}</th>
+                <th key={m} className="px-4 py-2 text-center text-gidim">{getMonthLabel(m, lang)}</th>
               ))}
-              <th className="px-4 py-2 text-center font-bold text-gidim">Total</th>
+              <th className="px-4 py-2 text-center font-bold text-gidim">{t('an.total')}</th>
             </tr>
           </thead>
           <tbody>
@@ -239,7 +241,7 @@ export default function AnalyticsTab({ students, attendance }) {
             onChange={e => setActiveSection(e.target.value)}
             className="px-3 py-2 border border-line2 rounded-lg text-sm bg-sumi3 text-gi"
           >
-            <option value="">All sections</option>
+            <option value="">{t('an.allSections')}</option>
             {sectionOptions.map(s => (
               <option key={s.id} value={s.id}>{s.label}</option>
             ))}
@@ -250,7 +252,7 @@ export default function AnalyticsTab({ students, attendance }) {
             onClick={() => downloadPDF('analytics-content', 'Karate_Attendance_Report', 'portrait')}
             className="dojo-cta px-4 py-2 rounded-lg text-sm"
           >
-            Download Full Report (PDF)
+            {t('an.downloadFull')}
           </button>
           <select
             value={selectedMonth}
@@ -258,14 +260,14 @@ export default function AnalyticsTab({ students, attendance }) {
             className="px-3 py-2 border border-line2 rounded-lg text-sm bg-sumi3 text-gi"
           >
             {monthlySummary.map(m => (
-              <option key={m.monthKey} value={m.monthKey}>{m.month}</option>
+              <option key={m.monthKey} value={m.monthKey}>{getMonthLabel(m.monthKey, lang)}</option>
             ))}
           </select>
           <button
             onClick={() => downloadPDF('analytics-month-content', `Karate_Report_${selectedMonth}`, 'portrait')}
             className="dojo-ghost px-4 py-2 rounded-lg text-sm"
           >
-            Download Month Report (PDF)
+            {t('an.downloadMonth')}
           </button>
         </div>
       </div>
@@ -278,23 +280,23 @@ export default function AnalyticsTab({ students, attendance }) {
         aria-hidden="true"
       >
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          Karate Black Belt Program — {getMonthLabel(selectedMonth)}
+          {t('an.reportTitle', { month: getMonthLabel(selectedMonth, lang) })}
         </h1>
         {selectedMonthlySummary && (
           <section className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-3">Monthly Summary</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-3">{t('an.monthlySummary')}</h2>
             <table className="min-w-full text-sm border rounded-lg">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Month</th>
-                  <th className="px-4 py-2 text-center">Total Attendance</th>
-                  <th className="px-4 py-2 text-center">Classes Held</th>
-                  <th className="px-4 py-2 text-center">Avg per Class</th>
+                  <th className="px-4 py-2 text-left">{t('an.month')}</th>
+                  <th className="px-4 py-2 text-center">{t('an.totalAttendance')}</th>
+                  <th className="px-4 py-2 text-center">{t('an.classesHeld')}</th>
+                  <th className="px-4 py-2 text-center">{t('an.avgPerClass')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-white">
-                  <td className="px-4 py-2 font-medium">{selectedMonthlySummary.month}</td>
+                  <td className="px-4 py-2 font-medium">{getMonthLabel(selectedMonth, lang)}</td>
                   <td className="px-4 py-2 text-center">{selectedMonthlySummary.totalAttendance}</td>
                   <td className="px-4 py-2 text-center">{selectedMonthlySummary.classesHeld}</td>
                   <td className="px-4 py-2 text-center">{selectedMonthlySummary.avgPerClass}</td>
@@ -304,15 +306,15 @@ export default function AnalyticsTab({ students, attendance }) {
           </section>
         )}
         <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Student Attendance</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-3">{t('an.studentAttendance')}</h2>
           <table className="min-w-full text-sm border rounded-lg">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Rank</th>
-                <th className="px-4 py-2 text-left">Student</th>
-                <th className="px-4 py-2 text-center">Classes Attended</th>
-                <th className="px-4 py-2 text-center">Classes Held</th>
-                <th className="px-4 py-2 text-center">Attendance %</th>
+                <th className="px-4 py-2 text-left">{t('an.rank')}</th>
+                <th className="px-4 py-2 text-left">{t('an.student')}</th>
+                <th className="px-4 py-2 text-center">{t('an.classesAttended')}</th>
+                <th className="px-4 py-2 text-center">{t('an.classesHeld')}</th>
+                <th className="px-4 py-2 text-center">{t('an.attendancePct')}</th>
               </tr>
             </thead>
             <tbody>
