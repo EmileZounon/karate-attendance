@@ -6,7 +6,7 @@
  * The emitted page is a static shell that reads attendance LIVE from Firestore in the
  * browser, so it never goes stale: fill in missing dates from the page itself, then print.
  * Output lands in public/<student>/index.html, so the normal `vite build` ships it at
- * /karate-attendance/<student>/ without touching the React app.
+ * /<student>/ without touching the React app.
  *
  * Class-length rules set by the instructor: Tue 1:15, Thu 1:15, Sun 2:00.
  */
@@ -487,4 +487,4 @@ document.getElementById('print-btn').addEventListener('click', () => {
 const out = path.join(ROOT, 'public', SLUG, 'index.html');
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, html);
-console.log(`Wrote ${out}\n  → ships at /karate-attendance/${SLUG}/`);
+console.log(`Wrote ${out}\n  → ships at /${SLUG}/`);
